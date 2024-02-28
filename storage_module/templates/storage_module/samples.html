@@ -1,0 +1,130 @@
+{% extends 'storage_module/base.html' %}
+
+{% block title %}Samples{% endblock %}
+
+{% block extra_script %}
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1 class="mb-4">Samples</h1>
+                <div class="container my-3">
+                    <form method="GET">
+                        <div class="input-group">
+                            <input type="text" class="form-control"
+                                   placeholder="Search Samples" name="search"
+                                   value="{{ request.GET.search }}">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit">Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th>Sample ID</th>
+                            <th>Sample Type</th>
+                            <th>Facility Name</th>
+                            <th>Source File Name</th>
+                            <th>Box Name</th>
+                            <th>Time Sampled</th>
+                            <th>Sample Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for sample in samples %}
+                            <tr>
+                                <td>{{ sample.sample_id }}</td>
+                                <td>{{ sample.sample_type__sample_type }}</td>
+                                <td>{{ sample.facility__facility_name }}</td>
+                                <td>{{ sample.source_file__source_file_name }}</td>
+                                <td>{{ sample.box__box_name }}</td>
+                                <td>{{ sample.time__time_sampled }}</td>
+                                <td id="sampleStatus{{ sample.sample_id }}">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle"
+                                                type="button"
+                                                id="dropdownSampleButton{{ sample.sample_id }}"
+                                                data-toggle="dropdown"
+                                                aria-haspopup="true"
+                                                aria-expanded="false">
+                                            {{ sample.sample_status__name }}
+                                        </button>
+                                        <div id="dropdownSample{{ sample.sample_id }}"
+                                             class="dropdown-menu"
+                                             aria-labelledby="dropdownSampleButton{{ sample.sample_id }}">
+                                            {% for status in sample_statuses %}
+                                                <a class="dropdown-item"
+                                                   href="{% url 'samples_url' %}?sample_id={{ sample.sample_id }}&sample_status={{ status.id }}">
+                                                    {{ status.name }}
+                                                </a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center p-5">
+                                    <h2>No Samples Found</h2>
+                                    <p>We couldn't find any samples at the moment.</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- If you have a pagination system -->
+                {% if samples %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <!-- First Page Link -->
+                            {% if samples.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1"
+                                       aria-label="First">
+                                        <span aria-hidden="true">&laquo;</span>
+                                        <span class="sr-only">First</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            <!-- Link to individual page -->
+                            {% for i in samples.paginator.page_range %}
+                                {% if samples.number == i %}
+                                    <li class="page-item active"><a class="page-link"
+                                                                    href="#">{{ i }}</a>
+                                    </li>
+                                {% elif i > samples.number|add:"-3" and i < samples.number|add:"3" %}
+                                    <li class="page-item"><a class="page-link"
+                                                             href="?page={{ i }}">{{ i }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            <!-- Last Page Link -->
+                            {% if samples.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="?page={{ samples.paginator.num_pages }}"
+                                       aria-label="Last">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        <span class="sr-only">Last</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
