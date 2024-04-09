@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'simple_history',
+    'django_select2',
     'storage_module.apps.EdcBaseAppConfig',
     'storage_module.apps.AppConfig'
 ]

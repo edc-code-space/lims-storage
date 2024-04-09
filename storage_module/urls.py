@@ -18,7 +18,10 @@ from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
 
-from storage_module.views import HomeView, SamplesView
+from storage_module.views import BoxDetailView, FacilityDetailView, FacilityListView, \
+    FreezerDetailView, \
+    HomeView, \
+    RackDetailView, SampleDetailView, SamplesView, ShelfDetailView
 
 urlpatterns = [
     path('accounts/', include('edc_base.auth.urls')),
@@ -26,8 +29,17 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', HomeView.as_view(), name='home_url'),
     path('samples/', SamplesView.as_view(), name='samples_url'),
+    path('samples/<str:sample_id>/', SampleDetailView.as_view(), name='sample_detail'),
+    path('box/<str:box_id>/', BoxDetailView.as_view(), name='box_detail'),
+    path('rack/<str:rack_id>/', RackDetailView.as_view(), name='rack_detail'),
+    path('shelf/<str:shelf_id>/', ShelfDetailView.as_view(), name='shelf_detail'),
+    path('freezer/<str:freezer_id>/', FreezerDetailView.as_view(), name='freezer_detail'),
+    path('facility/<str:facility_id>/', FacilityDetailView.as_view(),
+         name='facility_detail'),
     path('reports/', HomeView.as_view(), name='reports_url'),
     path('dashboard/', HomeView.as_view(), name='dashboard_url'),
+    path('storage_view/', FacilityListView.as_view(), name='storage_view'),
+    path('select2/', include('django_select2.urls')),
     path('help/', HomeView.as_view(), name='help_url'),
     path('', HomeView.as_view(), name='home_url'),
 ]

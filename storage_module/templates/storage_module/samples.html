@@ -36,6 +36,7 @@
                             <th>Box Name</th>
                             <th>Time Sampled</th>
                             <th>Sample Status</th>
+                            <th>Sample Dashboard</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -43,9 +44,9 @@
                             <tr>
                                 <td>{{ sample.sample_id }}</td>
                                 <td>{{ sample.sample_type__sample_type }}</td>
-                                <td>{{ sample.facility__facility_name }}</td>
+                                <td>{{ sample.box_position__box__rack__shelf__freezer__facility__facility_name }}</td>
                                 <td>{{ sample.source_file__source_file_name }}</td>
-                                <td>{{ sample.box__box_name }}</td>
+                                <td>{{ sample.box_position__box__box_name }}</td>
                                 <td>{{ sample.time__time_sampled }}</td>
                                 <td id="sampleStatus{{ sample.sample_id }}">
                                     <div class="dropdown">
@@ -68,6 +69,9 @@
                                             {% endfor %}
                                         </div>
                                     </div>
+                                </td>
+                                <td>
+                                    <a href="{% url 'sample_detail' sample_id=sample.sample_id %}">Dashboard</a>
                                 </td>
                             </tr>
                         {% empty %}

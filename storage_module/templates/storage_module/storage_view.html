@@ -1,0 +1,52 @@
+{% extends 'storage_module/base.html' %}
+
+{% block extra_script %}
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+
+{% endblock %}
+
+{% block content %}
+    <div class="container py-3">
+        <h1>Storage Facilities</h1>
+        <table class="table mt-2">
+            <thead>
+            <tr>
+                <th scope="col">Facility Name</th>
+                <th scope="col">Total Capacity (Samples)
+                    <i class="fas fa-info-circle" data-toggle="tooltip"
+                       data-placement="top"
+                       title="The maximum number of samples that the facility can hold"></i>
+                </th>
+                <th scope="col">Utilized Storage (Samples)
+                    <i class="fas fa-info-circle" data-toggle="tooltip"
+                       data-placement="top"
+                       title="The number of samples currently stored in the facility"></i>
+                </th>
+                <th scope="col">Available Capacity (Samples)
+                    <i class="fas fa-info-circle" data-toggle="tooltip"
+                       data-placement="top"
+                       title="The number of additional samples that the facility can still accommodate based on its total capacity"></i>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for facility in facility_data %}
+                <tr>
+                    <td>
+                        <a href="{% url 'facility_detail' facility.id %}">
+                            {{ facility.facility_name }}
+                        </a>
+                    </td>
+                    <td>{{ facility.facility_capacity }}</td>
+                    <td>{{ facility.utilized_storage }}</td>
+                    <td>{{ facility.available_capacity }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

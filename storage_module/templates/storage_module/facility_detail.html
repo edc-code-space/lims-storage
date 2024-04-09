@@ -1,0 +1,65 @@
+{% extends 'storage_module/base.html' %}
+{% load storage_module_extras %}
+
+{% block extra_script %}
+    <script>
+        $(document).ready(function () {
+            $('#facilityTable tr[data-toggle="collapse"]').css({ cursor: 'pointer' }).attr('aria-expanded', 'false').find('.toggle-icon').addClass('fa-caret-right');
+
+            $('#facilityTable tr[data-toggle="collapse"]').click(function () {
+                var $this = $(this);
+                var $icon = $this.find('.toggle-icon');
+
+                if ($icon.hasClass('fa-caret-right')) {
+                    $icon.removeClass('fa-caret-right');
+                    $icon.addClass('fa-caret-down');
+                    $this.nextUntil('tr[data-toggle="collapse"]').collapse('show');
+                } else {
+                    $icon.removeClass('fa-caret-down');
+                    $icon.addClass('fa-caret-right');
+                    $this.nextUntil('tr[data-toggle="collapse"]').collapse('hide');
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>Facility: {{ object.facility_name }}</h2>
+        <table id="facilityTable" class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Capacity</th>
+                <th>Stored Samples</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for freezer_data in facility_data %}
+                <tr data-toggle="collapse" data-target=".freezer{{ forloop.counter }}">
+                    <td>
+                        <i class="fas toggle-icon" style="transition: transform 0.3s;"></i>
+                        <i class="fas fa-snowflake"></i>
+                        <a href="{% url 'freezer_detail' freezer_data.freezer.id %}">{{ freezer_data.freezer.freezer_name }}</a>
+                    </td>
+                    <td>{{ freezer_data.freezer_total_capacity }}</td>
+                    <td>{{ freezer_data.freezer_total_samples }}</td>
+                </tr>
+                {% for iterm in freezer_data.inside_freezer %}
+                    <tr class="collapse freezer{{ forloop.parentloop.counter }}">
+                        <td>
+                            <i class="{{ iterm.icon }}"></i>
+                            <a href="{% url iterm.url iterm.id %}">{{ iterm.name }}</a>
+                        </td>
+                        <td>{{ iterm.capacity }}</td>
+                        <td>{{ iterm.stored_samples }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
