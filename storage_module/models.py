@@ -48,8 +48,8 @@ class BoxPosition(models.Model):
 
 class DimBox(models.Model):
     box_name = models.CharField(max_length=255)
-    box_description = models.TextField()
-    box_capacity = models.IntegerField(default=100)
+    box_description = models.TextField(null=True, )
+    box_capacity = models.IntegerField(default=100, null=True, )
     rack = models.ForeignKey('DimRack', on_delete=models.CASCADE, related_name='boxes',
                              null=True, blank=True)
     shelf = models.ForeignKey('DimShelf', on_delete=models.CASCADE, related_name='boxes',
@@ -117,6 +117,20 @@ class Note(models.Model):
 
 class DimSample(models.Model):
     sample_id = models.CharField(max_length=255)
+    protocol_number = models.CharField(max_length=255, null=True, )
+    positions = models.IntegerField(null=True, )
+    tid = models.CharField(max_length=255, null=True, )
+    participant_id = models.CharField(max_length=255, null=True, )
+    gender = models.CharField(max_length=255, null=True, )
+    date_of_birth = models.DateField(null=True, )
+    date_sampled = models.DateField(null=True, )
+    time_sampled = models.TimeField(null=True, )
+    sample_condition = models.CharField(max_length=255, null=True, )
+    user_created = models.CharField(max_length=255, null=True, )
+    cinitials = models.CharField(max_length=255, null=True, )
+    visit_code = models.CharField(max_length=255, null=True, )
+    data_source = models.CharField(max_length=255, null=True, )
+    requisition_id = models.CharField(max_length=255, null=True, )
     sample_type = models.ForeignKey('DimSampleType', on_delete=models.CASCADE)
     source_file = models.ForeignKey('DimSourceFile', on_delete=models.CASCADE)
     time = models.ForeignKey('DimTime', on_delete=models.CASCADE)
@@ -151,8 +165,8 @@ class DimSample(models.Model):
 
 
 class DimRack(models.Model):
-    rack_name = models.CharField(max_length=50)
-    rack_description = models.TextField()
+    rack_name = models.CharField(max_length=50, null=True)
+    rack_description = models.TextField(null=True)
     shelf = models.ForeignKey('DimShelf', on_delete=models.CASCADE, related_name='racks',
                               null=True, blank=True)
     freezer = models.ForeignKey('DimFreezer', on_delete=models.CASCADE,
@@ -176,8 +190,8 @@ class DimShelf(models.Model):
 
 class DimFreezer(models.Model):
     freezer_name = models.CharField(max_length=255)
-    freezer_description = models.TextField()
-    facility = models.ForeignKey('DimFacility', on_delete=models.CASCADE)
+    freezer_description = models.TextField(null=True)
+    facility = models.ForeignKey('DimFacility', on_delete=models.CASCADE, null=True)
 
     class Meta:
         app_label = 'storage_module'
