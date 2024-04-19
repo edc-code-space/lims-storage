@@ -51,7 +51,7 @@ class SamplesView(TemplateView):
             'box_position__box__rack__shelf__freezer__facility__facility_name',
             'source_file__source_file_name',
             'box_position__box__box_name',
-            'time__time_sampled',
+            'date_sampled',
             'sample_status__name'
         )
         if query:
@@ -92,7 +92,7 @@ class SampleDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        box = self.object.box_position.box
+        box = DimBox.objects.get(boxposition__sample_id=self.object.sample_id)
         rack = box.location.get('rack', None)
         shelf = box.location.get('shelf', None)
         freezer = box.location.get('freezer', None)

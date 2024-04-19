@@ -12,7 +12,7 @@ class DimFacility(models.Model):
 
 
 class DimSampleType(models.Model):
-    sample_type = models.CharField(max_length=255)
+    sample_type = models.CharField(max_length=255, unique=True)
 
     class Meta:
         app_label = 'storage_module'
@@ -21,7 +21,7 @@ class DimSampleType(models.Model):
 
 class DimSourceFile(models.Model):
     source_file_name = models.CharField(max_length=100)
-    source_file_description = models.TextField()
+    source_file_description = models.TextField(null=True)
 
     class Meta:
         app_label = 'storage_module'
@@ -30,7 +30,7 @@ class DimSourceFile(models.Model):
 
 class BoxPosition(models.Model):
     sample = models.OneToOneField('DimSample', on_delete=models.CASCADE,
-                                  related_name="box_position")
+                                  related_name="box_position", to_field='sample_id')
     box = models.ForeignKey('DimBox', on_delete=models.CASCADE)
     x_position = models.IntegerField(verbose_name="X Position",
                                      help_text='Horizontal position in the box grid')
@@ -40,10 +40,7 @@ class BoxPosition(models.Model):
     class Meta:
         app_label = 'storage_module'
         db_table = 'boxposition'
-        constraints = [
-            models.UniqueConstraint(fields=['box', 'x_position', 'y_position'],
-                                    name='unique_position_in_box')
-        ]
+        unique_together = ('box', 'x_position', 'y_position')
 
 
 class DimBox(models.Model):
@@ -60,6 +57,7 @@ class DimBox(models.Model):
     class Meta:
         app_label = 'storage_module'
         db_table = 'dimbox'
+        unique_together = ('id', 'box_capacity', 'rack', 'shelf', 'freezer')
 
     @property
     def positions(self):
@@ -71,14 +69,23 @@ class DimBox(models.Model):
     @property
     def location(self):
         if self.rack:
-            return {'facility': self.rack.shelf.freezer.facility,
-                    'freezer': self.rack.shelf.freezer, 'shelf': self.rack.shelf,
-                    'rack': self.rack}
-        elif self.shelf:
-            return {'facility': self.shelf.freezer.facility,
-                    'freezer': self.shelf.freezer, 'shelf': self.shelf}
-        elif self.freezer:
-            return {'facility': self.freezer.facility, 'freezer': self.freezer}
+            return {
+                'facility': getattr(getattr(self.rack, 'freezer', None), 'facility', None),
+                'freezer': getattr(self.rack, 'freezer', None),
+                'shelf': getattr(self.rack, 'shelf', None),
+                'rack': self.rack
+            }
+        if self.shelf:
+            return {
+                'facility': getattr(getattr(self.shelf, 'freezer', None), 'facility', None),
+                'freezer': getattr(self.shelf, 'freezer', None),
+                'shelf': self.shelf
+            }
+        if self.freezer:
+            return {
+                'facility': self.freezer.facility,
+                'freezer': self.freezer
+            }
 
 
 class DimTime(models.Model):
@@ -116,24 +123,21 @@ class Note(models.Model):
 
 
 class DimSample(models.Model):
-    sample_id = models.CharField(max_length=255)
+    sample_id = models.CharField(max_length=255, unique=True)
     protocol_number = models.CharField(max_length=255, null=True, )
-    positions = models.IntegerField(null=True, )
     tid = models.CharField(max_length=255, null=True, )
     participant_id = models.CharField(max_length=255, null=True, )
     gender = models.CharField(max_length=255, null=True, )
     date_of_birth = models.DateField(null=True, )
     date_sampled = models.DateField(null=True, )
-    time_sampled = models.TimeField(null=True, )
+    time_sampled = models.CharField(null=True, max_length=225)
     sample_condition = models.CharField(max_length=255, null=True, )
     user_created = models.CharField(max_length=255, null=True, )
     cinitials = models.CharField(max_length=255, null=True, )
     visit_code = models.CharField(max_length=255, null=True, )
-    data_source = models.CharField(max_length=255, null=True, )
     requisition_id = models.CharField(max_length=255, null=True, )
-    sample_type = models.ForeignKey('DimSampleType', on_delete=models.CASCADE)
-    source_file = models.ForeignKey('DimSourceFile', on_delete=models.CASCADE)
-    time = models.ForeignKey('DimTime', on_delete=models.CASCADE)
+    sample_type = models.ForeignKey('DimSampleType', on_delete=models.CASCADE, null=True)
+    source_file = models.ForeignKey('DimSourceFile', on_delete=models.CASCADE, null=True)
     sample_status = models.ForeignKey('DimSampleStatus', on_delete=models.CASCADE,
                                       null=True)
 

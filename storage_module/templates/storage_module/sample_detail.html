@@ -22,8 +22,10 @@
             <h1>Sample Dashboard</h1>
             <ul class="list-group mt-3">
                 <li class="list-group-item">
-                    <i class="fas fa-warehouse"></i>
-                    <a href="{% url 'facility_detail' box.location.facility.id %}">{{ box.location.facility.facility_name }}</a>
+                    {% if box.location.facility %}
+                        <i class="fas fa-warehouse"></i>
+                        <a href="{% url 'facility_detail' box.location.facility.id %}">{{ box.location.facility.facility_name }}</a>
+                    {% endif %}
                     {% if box.location.freezer %}
                         <ul class="list-group">
                         <li class="list-group-item">
