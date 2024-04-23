@@ -2492,7 +2492,7 @@ var id='';</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>640</xloc>
+      <xloc>896</xloc>
       <yloc>464</yloc>
       <draw>Y</draw>
     </GUI>
@@ -2581,7 +2581,7 @@ var id='';</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>768</xloc>
+      <xloc>1008</xloc>
       <yloc>464</yloc>
       <draw>Y</draw>
     </GUI>
@@ -2616,7 +2616,7 @@ var id='';</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>896</xloc>
+      <xloc>1152</xloc>
       <yloc>464</yloc>
       <draw>Y</draw>
     </GUI>
@@ -2652,7 +2652,7 @@ var id='';</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1024</xloc>
+      <xloc>1312</xloc>
       <yloc>464</yloc>
       <draw>Y</draw>
     </GUI>
