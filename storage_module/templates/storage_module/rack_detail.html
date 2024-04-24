@@ -6,6 +6,15 @@
         $(document).ready(function () {
             $('.select2').select2();
         });
+        $(document).ready(function () {
+            var table = $('#rack-table').DataTable({
+                dom: 'Bfrtip',
+                paging: false,
+                scrollCollapse: true,
+                scrollY: '60vh',
+                "order": [[1, 'asc']]
+            });
+        });
     </script>
     <style>
         .select2-container--default .select2-selection--single {
@@ -20,7 +29,7 @@
 
         <!-- List the Boxes on the Shelf -->
         <h2>Boxes on this {{ dash_name }}</h2>
-        <table class="table mt-2">
+        <table id="rack-table" class="table mt-2">
             <thead>
             <tr>
                 <th scope="col">#</th>

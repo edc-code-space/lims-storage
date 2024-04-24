@@ -70,14 +70,16 @@ class DimBox(models.Model):
     def location(self):
         if self.rack:
             return {
-                'facility': getattr(getattr(self.rack, 'freezer', None), 'facility', None),
+                'facility': getattr(getattr(self.rack, 'freezer', None), 'facility',
+                                    None),
                 'freezer': getattr(self.rack, 'freezer', None),
                 'shelf': getattr(self.rack, 'shelf', None),
                 'rack': self.rack
             }
         if self.shelf:
             return {
-                'facility': getattr(getattr(self.shelf, 'freezer', None), 'facility', None),
+                'facility': getattr(getattr(self.shelf, 'freezer', None), 'facility',
+                                    None),
                 'freezer': getattr(self.shelf, 'freezer', None),
                 'shelf': self.shelf
             }
@@ -142,6 +144,13 @@ class DimSample(models.Model):
                                       null=True)
 
     history = HistoricalRecords()
+
+    def save(self, *args, **kwargs):
+        if self.sample_status and self.sample_status.name not in ['In Storage',
+                                                                  'Archived']:
+            BoxPosition.objects.filter(sample_id=self.sample_id).delete()
+
+        return super().save(*args, **kwargs)
 
     class Meta:
         app_label = 'storage_module'

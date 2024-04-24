@@ -1,6 +1,20 @@
 {% extends 'storage_module/base.html' %}
 {% load storage_module_extras %}
 
+{% block extra_script %}
+    <script>
+        $(document).ready(function () {
+            var table = $('#freezerTable').DataTable({
+                dom: 'Bfrtip',
+                paging: false,
+                scrollCollapse: true,
+                scrollY: '60vh',
+                "order": [[1, 'asc']]
+            });
+        });
+    </script>
+{% endblock %}
+
 {% block content %}
     <div class="container">
         <div class="breadcrumb mt-2">
@@ -26,15 +40,15 @@
 
             {% if obj.rack %}
                 <a href="{% url 'rack_detail' obj.rack.id %}" class="breadcrumb-item">
-                    <i class="fas fa-warehouse"></i> {{ obj.rack.rack_name }}
+                    <i class='fas fa-box-open'></i> {{ obj.rack.rack_name }}
                 </a>
             {% endif %}
 
             <span class="breadcrumb-item active">
-                <i class="fas fa-box"></i> {{ name }}
+                <i class="{{ icon }}"></i> {{ name }}
             </span>
         </div>
-        <table id="facilityTable" class="table table-bordered">
+        <table id="freezerTable" class="table table-bordered">
             <thead>
             <tr>
                 <th>Name</th>

@@ -44,33 +44,33 @@
                         <i class="fas fa-box-open"></i>
                         <a href="{% url 'rack_detail' box.location.rack.id %}">{{ box.location.rack.rack_name }}</a>
                     {% endif %}
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <i class="fas fa-cube"></i>
-                            <a href="{% url 'box_detail' box.id %}">{{ box.box_name }}</a>
-                            <ul class="list-group mt-2">
-                                <li class="list-group-item">
-                                    {% with box_capacity=10 %}
+                    {% if box %}
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <i class="fas fa-cube"></i>
+                                <a href="{% url 'box_detail' box.id %}">{{ box.box_name }}</a>
+                                <ul class="list-group mt-2">
+                                    <li class="list-group-item">
                                         <!-- Box Capacity for 10 x 10 grid -->
                                         <ul class="list-group mt-3">
-                                            <h2>Box
-                                                Positions:</h2>
+                                            <h2>Box Positions:</h2>
                                             <table class="table mt-2">
                                                 <thead>
                                                 <tr>
-                                                    {% for x in box_capacity|make_range %}
+                                                    <th scope="col">#</th>
+                                                    {% for x in x_labels %}
                                                         <th scope="col">{{ x }}</th>
                                                     {% endfor %}
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                {% for y in box_capacity|make_range %}
+                                                {% for y in y_labels %}
                                                     <tr>
-                                                        {% for x in box_capacity|make_range %}
+                                                        <th scope="row">{{ y }}</th>
+                                                        {% for x in x_labels %}
                                                             <td>
-                                                                {% if box.positions.0.x_position == x and box.positions.0.y_position == y %}
+                                                                {% if sample_position.x_position == forloop.counter0 and sample_position.y_position == y %}
                                                                     <i class="fas fa-vial"></i>
-                                                                    <!-- Sample icon -->
                                                                 {% endif %}
                                                             </td>
                                                         {% endfor %}
@@ -79,11 +79,15 @@
                                                 </tbody>
                                             </table>
                                         </ul>
-                                    {% endwith %}
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    {% else %}
+                        <div class="alert alert-danger" role="alert">The sample is not in
+                            storage.
+                        </div>
+                    {% endif %}
                     {% if box.location.rack %}
                         </li>
                         </ul>
@@ -112,7 +116,9 @@
                     <li class="list-group-item">
                         <strong>Time:</strong> {{ sample.time.time_sampled }}</li>
                     <li class="list-group-item">
-                        <strong>Status:</strong> {{ sample.sample_status.name }}</li>
+                        <strong>Status:</strong> <span
+                            class="badge badge-secondary">{{ sample.sample_status.name }}</span>
+                    </li>
                 </ul>
             </div>
         </div>
