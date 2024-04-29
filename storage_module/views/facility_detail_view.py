@@ -2,7 +2,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
 
-from ..models import (BoxPosition, DimBox, DimFacility)
+from ..models import BoxPosition, DimBox, DimFacility
 
 
 class FacilityDetailView(DetailView):
@@ -23,19 +23,12 @@ class FacilityDetailView(DetailView):
 
         for box in boxes:
             samples_in_box = BoxPosition.objects.filter(box=box).count()
+
             if samples_in_box > 0:
                 capacity += box.box_capacity
                 stored_samples += samples_in_box
-
-                _box = {
-                    'id': box.id,
-                    'url': url,
-                    'icon': icon,
-                    'name': box.box_name,
-                    'capacity': box.box_capacity,
-                    'stored_samples': samples_in_box,
-                }
-
+                _box = self._create_dict(box.id, url, icon, box.box_name,
+                                         box.box_capacity, samples_in_box)
                 aggregated_boxes.append(_box)
 
         return aggregated_boxes, capacity, stored_samples
@@ -53,15 +46,12 @@ class FacilityDetailView(DetailView):
                 Q(rack__freezer=freezer) |
                 Q(freezer=freezer)
             )
-
             freezer_data = {'freezer': freezer}
             box_n_shelves_n_racks_data = []
-            freezer_total_samples = 0
+
+            freezer_total_samples = sum(len(box.get_samples()) for box in boxes)
             freezer_total_capacity = sum(box.box_capacity for box in boxes)
             selected_box_ids = freezer.boxes.all().values_list('id', flat=True)
-
-            for box in boxes:
-                freezer_total_samples += len(box.get_samples())
 
             aggregated_boxes, _, _ = self._aggregate_boxes(
                 freezer.boxes.filter(shelf=None, rack=None), 'box_detail', 'fas fa-cube')
@@ -71,33 +61,17 @@ class FacilityDetailView(DetailView):
                 aggregated_boxes, capacity, stored_samples = self._aggregate_boxes(
                     shelf.boxes.all(), 'shelf_detail', 'fas fa-layer-group')
                 box_n_shelves_n_racks_data += aggregated_boxes
-
-                _shelf = {
-                    'id': shelf.id,
-                    'url': 'shelf_detail',
-                    'icon': 'fas fa-layer-group',
-                    'name': shelf.shelf_name,
-                    'capacity': capacity,
-                    'stored_samples': stored_samples
-                }
-
-                box_n_shelves_n_racks_data += [_shelf]
+                box_n_shelves_n_racks_data.append(
+                    self._create_dict(shelf.id, 'shelf_detail', 'fas fa-layer-group',
+                                      shelf.shelf_name, capacity, stored_samples))
 
             for rack in freezer.racks.all():
                 aggregated_boxes, capacity, stored_samples = self._aggregate_boxes(
                     rack.boxes.all(), 'rack_detail', 'fas fa-box-open')
                 box_n_shelves_n_racks_data += aggregated_boxes
-
-                _rack = {
-                    'id': rack.id,
-                    'url': 'rack_detail',
-                    'icon': 'fas fa-box-open',
-                    'name': rack.rack_name,
-                    'capacity': capacity,
-                    'stored_samples': stored_samples
-                }
-
-                box_n_shelves_n_racks_data += [_rack]
+                box_n_shelves_n_racks_data.append(
+                    self._create_dict(rack.id, 'rack_detail', 'fas fa-box-open',
+                                      rack.rack_name, capacity, stored_samples))
 
             freezer_data.update(
                 inside_freezer=box_n_shelves_n_racks_data,
@@ -108,4 +82,15 @@ class FacilityDetailView(DetailView):
             facility_data.append(freezer_data)
 
         context['facility_data'] = facility_data
+
         return context
+
+    def _create_dict(self, id, url, icon, name, capacity, stored_samples):
+        return {
+            'id': id,
+            'url': url,
+            'icon': icon,
+            'name': name,
+            'capacity': capacity,
+            'stored_samples': stored_samples
+        }
