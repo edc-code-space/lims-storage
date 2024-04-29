@@ -10,85 +10,56 @@ class FreezerDetailView(DetailView):
     template_name = 'storage_module/freezer_detail.html'
 
     def get_object(self, queryset=None):
-        freezer_id = self.kwargs.get('freezer_id')
-        return get_object_or_404(DimFreezer, id=freezer_id)
+        return get_object_or_404(DimFreezer, id=self.kwargs.get('freezer_id'))
 
     def post(self, request, *args, **kwargs):
         form = MoveBoxForm(request.POST)
         if form.is_valid():
-            freezer = self.get_object()
-            box = freezer.boxes.get(id=request.POST['box_id'])
-            box.freezer = form.cleaned_data.get('freezer')
-            box.shelf = form.cleaned_data.get('shelf')
-            box.rack = form.cleaned_data.get('rack')
-            box.save()
+            self.move_box_using_form_data(form)
         return super().get(request, *args, **kwargs)
+
+    def move_box_using_form_data(self, form):
+        box = self.get_object().boxes.get(id=self.request.POST['box_id'])
+        box.freezer = form.cleaned_data['freezer']
+        box.shelf = form.cleaned_data['shelf']
+        box.rack = form.cleaned_data['rack']
+        box.save()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         freezer = self.object
-        boxes = freezer.boxes.all()
-        move_box_form = MoveBoxForm()
-
-        freezer_data = {}
-        total_samples = BoxPosition.objects.count()
-
-        box_n_shelves_n_racks_data = []
-        for box in freezer.boxes.filter(shelf=None, rack=None):
-            samples_in_box = BoxPosition.objects.filter(box=box).count()
-            if samples_in_box > 0:
-                _box = {
-                    'id': box.id,
-                    'url': 'box_detail',
-                    'icon': 'fas fa-cube',
-                    'name': box.box_name,
-                    'capacity': box.box_capacity,
-                    'stored_samples': samples_in_box,
-                }
-                box_n_shelves_n_racks_data.append(_box)
-
-        for shelf in freezer.shelves.all():
-            boxes_on_shelf = shelf.boxes.all()
-            capacity = 0
-            boxes_on_shelf_samples = 0
-            for box in boxes_on_shelf:
-                boxes_on_shelf_samples = BoxPosition.objects.filter(box=box).count()
-                if boxes_on_shelf_samples > 0:
-                    capacity += box.box_capacity
-            _shelf = {
-                'id': shelf.id,
-                'url': 'shelf_detail',
-                'icon': 'fas fa-layer-group',
-                'name': shelf.shelf_name,
-                'capacity': capacity,
-                'stored_samples': boxes_on_shelf_samples
-            }
-            box_n_shelves_n_racks_data.append(_shelf)
-
-        for rack in freezer.racks.all():
-            boxes_on_rack = rack.boxes.all()
-            capacity = 0
-            boxes_on_rack_samples = 0
-            for box in boxes_on_rack:
-                boxes_on_rack_samples = BoxPosition.objects.filter(box=box).count()
-                if boxes_on_rack_samples > 0:
-                    capacity += box.box_capacity
-            _rack = {
-                'id': rack.id,
-                'url': 'rack_detail',
-                'icon': 'fas fa-box-open',
-                'name': rack.rack_name,
-                'capacity': capacity,
-                'stored_samples': boxes_on_rack_samples
-            }
-            box_n_shelves_n_racks_data.append(_rack)
-
-        context['inside_freezer'] = box_n_shelves_n_racks_data
-        context['type'] = 'Freezer'
-        context['name'] = freezer.freezer_name
-        context['obj'] = freezer
-        context['icon'] = 'fas fa-snowflake'
-        context['facility'] = freezer.facility
-
+        context['inside_freezer'] = self.get_inside_freezer_data(freezer)
+        context.update({
+            'type': 'Freezer',
+            'name': freezer.freezer_name,
+            'obj': freezer,
+            'icon': 'fas fa-snowflake',
+            'facility': freezer.facility,
+        })
         return context
+
+    def get_inside_freezer_data(self, freezer):
+        data = []
+        for element, url, icon in [
+            (freezer.boxes.filter(shelf=None, rack=None), 'box_detail', 'fas fa-cube'),
+            (freezer.shelves.all(), 'shelf_detail', 'fas fa-layer-group'),
+            (freezer.racks.all(), 'rack_detail', 'fas fa-box-open')]:
+            data.extend(self.get_element_data(element, url, icon))
+        return data
+
+    @staticmethod
+    def get_element_data(element, url, icon):
+        result = []
+        for e in element:
+            samples_in_element = BoxPosition.objects.filter(box=e).count()
+            if samples_in_element > 0:
+                data = {
+                    'id': e.id,
+                    'url': url,
+                    'icon': icon,
+                    'name': getattr(e, f'{e.__class__.__name__.lower()}_name'),
+                    'capacity': getattr(e, f'{e.__class__.__name__.lower()}_capacity', 0),
+                    'stored_samples': samples_in_element,
+                }
+                result.append(data)
+        return result
