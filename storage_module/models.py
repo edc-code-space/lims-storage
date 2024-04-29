@@ -6,6 +6,9 @@ from simple_history.models import HistoricalRecords
 class DimFacility(models.Model):
     facility_name = models.CharField(max_length=255)
 
+    def __str__(self):
+        return self.facility_name
+
     class Meta:
         app_label = 'storage_module'
         db_table = 'dimfacility'
@@ -34,8 +37,9 @@ class BoxPosition(models.Model):
     box = models.ForeignKey('DimBox', on_delete=models.CASCADE)
     x_position = models.IntegerField(verbose_name="X Position",
                                      help_text='Horizontal position in the box grid')
-    y_position = models.IntegerField(verbose_name="Y Position",
-                                     help_text='Vertical position in the box grid')
+    y_position = models.CharField(verbose_name="Y Position",
+                                  max_length=255,
+                                  help_text='Vertical position in the box grid')
 
     class Meta:
         app_label = 'storage_module'
@@ -53,6 +57,9 @@ class DimBox(models.Model):
                               null=True, blank=True)
     freezer = models.ForeignKey('DimFreezer', on_delete=models.CASCADE,
                                 related_name='boxes', null=True, blank=True)
+
+    def __str__(self):
+        return self.box_name
 
     class Meta:
         app_label = 'storage_module'
@@ -185,6 +192,9 @@ class DimRack(models.Model):
     freezer = models.ForeignKey('DimFreezer', on_delete=models.CASCADE,
                                 related_name='racks', null=True, blank=True)
 
+    def __str__(self):
+        return self.rack_name
+
     class Meta:
         app_label = 'storage_module'
         db_table = 'dimrack'
@@ -196,6 +206,9 @@ class DimShelf(models.Model):
     freezer = models.ForeignKey('DimFreezer', on_delete=models.CASCADE,
                                 related_name='shelves', null=True, blank=True)
 
+    def __str__(self):
+        return self.shelf_name
+
     class Meta:
         app_label = 'storage_module'
         db_table = 'dimshelf'
@@ -205,6 +218,9 @@ class DimFreezer(models.Model):
     freezer_name = models.CharField(max_length=255)
     freezer_description = models.TextField(null=True)
     facility = models.ForeignKey('DimFacility', on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.freezer_name
 
     class Meta:
         app_label = 'storage_module'

@@ -1,8 +1,8 @@
-from django.db.models import Sum
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
 
-from ..models import (BoxPosition, DimFacility)
+from ..models import (BoxPosition, DimBox, DimFacility)
 
 
 class FacilityDetailView(DetailView):
@@ -16,69 +16,88 @@ class FacilityDetailView(DetailView):
         facility_id = self.kwargs.get('facility_id')
         return get_object_or_404(DimFacility, id=facility_id)
 
+    def _aggregate_boxes(self, boxes, url, icon):
+        capacity = 0
+        stored_samples = 0
+        aggregated_boxes = []
+
+        for box in boxes:
+            samples_in_box = BoxPosition.objects.filter(box=box).count()
+            if samples_in_box > 0:
+                capacity += box.box_capacity
+                stored_samples += samples_in_box
+
+                _box = {
+                    'id': box.id,
+                    'url': url,
+                    'icon': icon,
+                    'name': box.box_name,
+                    'capacity': box.box_capacity,
+                    'stored_samples': samples_in_box,
+                }
+
+                aggregated_boxes.append(_box)
+
+        return aggregated_boxes, capacity, stored_samples
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         facility = self.object
         facility_data = []
-        total_samples = BoxPosition.objects.count()
 
         for freezer in facility.dimfreezer_set.all():
-            freezer_data = {'freezer': freezer}
-            freezer_total_capacity = freezer.boxes.aggregate(Sum('box_capacity'))[
-                'box_capacity__sum']
-            selected_box_ids = freezer.boxes.all().values_list('id', flat=True)
-            freezer_total_samples = BoxPosition.objects.filter(
-                box__id__in=selected_box_ids).count()
+            boxes = DimBox.objects.filter(
+                Q(shelf__freezer=freezer) |
+                Q(rack__shelf__freezer=freezer) |
+                Q(rack__freezer=freezer) |
+                Q(freezer=freezer)
+            )
 
+            freezer_data = {'freezer': freezer}
             box_n_shelves_n_racks_data = []
-            for box in freezer.boxes.filter(shelf=None, rack=None):
-                samples_in_box = BoxPosition.objects.filter(box=box).count()
-                if samples_in_box > 0:
-                    _box = {
-                        'id': box.id,
-                        'url': 'box_detail',
-                        'icon': 'fas fa-cube',
-                        'name': box.box_name,
-                        'capacity': box.box_capacity,
-                        'stored_samples': samples_in_box,
-                    }
-                    box_n_shelves_n_racks_data.append(_box)
+            freezer_total_samples = 0
+            freezer_total_capacity = sum(box.box_capacity for box in boxes)
+            selected_box_ids = freezer.boxes.all().values_list('id', flat=True)
+
+            for box in boxes:
+                freezer_total_samples += len(box.get_samples())
+
+            aggregated_boxes, _, _ = self._aggregate_boxes(
+                freezer.boxes.filter(shelf=None, rack=None), 'box_detail', 'fas fa-cube')
+            box_n_shelves_n_racks_data += aggregated_boxes
 
             for shelf in freezer.shelves.all():
-                boxes_on_shelf = shelf.boxes.all()
-                capacity = 0
-                boxes_on_shelf_samples = 0
-                for box in boxes_on_shelf:
-                    boxes_on_shelf_samples = BoxPosition.objects.filter(box=box).count()
-                    if boxes_on_shelf_samples > 0:
-                        capacity += box.box_capacity
+                aggregated_boxes, capacity, stored_samples = self._aggregate_boxes(
+                    shelf.boxes.all(), 'shelf_detail', 'fas fa-layer-group')
+                box_n_shelves_n_racks_data += aggregated_boxes
+
                 _shelf = {
                     'id': shelf.id,
                     'url': 'shelf_detail',
                     'icon': 'fas fa-layer-group',
                     'name': shelf.shelf_name,
                     'capacity': capacity,
-                    'stored_samples': boxes_on_shelf_samples
+                    'stored_samples': stored_samples
                 }
-                box_n_shelves_n_racks_data.append(_shelf)
+
+                box_n_shelves_n_racks_data += [_shelf]
 
             for rack in freezer.racks.all():
-                boxes_on_rack = rack.boxes.all()
-                capacity = 0
-                boxes_on_rack_samples = 0
-                for box in boxes_on_rack:
-                    boxes_on_rack_samples = BoxPosition.objects.filter(box=box).count()
-                    if boxes_on_rack_samples > 0:
-                        capacity += box.box_capacity
+                aggregated_boxes, capacity, stored_samples = self._aggregate_boxes(
+                    rack.boxes.all(), 'rack_detail', 'fas fa-box-open')
+                box_n_shelves_n_racks_data += aggregated_boxes
+
                 _rack = {
                     'id': rack.id,
                     'url': 'rack_detail',
                     'icon': 'fas fa-box-open',
                     'name': rack.rack_name,
                     'capacity': capacity,
-                    'stored_samples': boxes_on_rack_samples
+                    'stored_samples': stored_samples
                 }
-                box_n_shelves_n_racks_data.append(_rack)
+
+                box_n_shelves_n_racks_data += [_rack]
 
             freezer_data.update(
                 inside_freezer=box_n_shelves_n_racks_data,

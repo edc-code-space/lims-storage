@@ -21,7 +21,7 @@ from django.urls.conf import include
 from storage_module import views
 from storage_module.views import BoxDetailView, FacilityDetailView, FacilityListView, \
     FreezerDetailView, HomeView, RackDetailView, SampleDetailView, SamplesView, \
-    ShelfDetailView
+    ShelfDetailView, SampleMoveWizard
 
 urlpatterns = [
     path('accounts/', include('edc_base.auth.urls')),
@@ -39,6 +39,7 @@ urlpatterns = [
     path('freezer_data/<int:freezer_id>/', views.freezer_data, name='freezer_data'),
     path('facility/<str:facility_id>/', FacilityDetailView.as_view(),
          name='facility_detail'),
+    path('move_samples/', SampleMoveWizard.as_view(), name='move_samples'),
     path('reports/', HomeView.as_view(), name='reports_url'),
     path('dashboard/', HomeView.as_view(), name='dashboard_url'),
     path('storage_view/', FacilityListView.as_view(), name='storage_view'),

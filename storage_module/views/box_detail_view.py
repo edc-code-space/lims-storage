@@ -1,8 +1,11 @@
-from django.shortcuts import get_object_or_404
+from urllib.parse import urlencode
+
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.views.generic import DetailView
 
 from storage_module.forms import MoveBoxForm
-from storage_module.models import DimBox
+from storage_module.models import DimBox, DimSampleStatus
 
 
 class BoxDetailView(DetailView):
@@ -15,6 +18,15 @@ class BoxDetailView(DetailView):
 
     def post(self, request, *args, **kwargs):
         form = MoveBoxForm(request.POST)
+
+        action = request.POST.get('action')
+        if action == 'move':
+            selected_samples = request.POST.getlist('sample_ids')
+            base_url = reverse('move_samples')
+            query_string = urlencode({'sample_ids': ','.join(selected_samples)})
+            url = '{}?{}'.format(base_url, query_string)
+            return redirect(url)
+
         if form.is_valid():
             box = self.get_object()
             box.freezer = form.cleaned_data.get('freezer')
@@ -59,7 +71,12 @@ class BoxDetailView(DetailView):
             facility=facility,
             move_box_form=move_box_form,
             x_labels=x_labels,
-            y_labels=y_labels
+            y_labels=y_labels,
+            sample_statuses=self.sample_statuses,
         )
 
         return context
+
+    @property
+    def sample_statuses(self):
+        return DimSampleStatus.objects.all()

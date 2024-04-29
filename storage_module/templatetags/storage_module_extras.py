@@ -14,3 +14,8 @@ def make_range(n):
 def is_instance(obj, model_name):
     model = django_apps.get_model(app_label='storage_module', model_name=model_name)
     return isinstance(obj, model)
+
+
+@register.filter
+def hasattr(obj, attr):
+    return hasattr(obj, attr)

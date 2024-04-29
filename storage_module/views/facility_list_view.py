@@ -1,6 +1,7 @@
+from django.db.models import Q
 from django.views.generic import ListView
 
-from ..models import DimFacility
+from ..models import DimBox, DimFacility
 
 
 class FacilityListView(ListView):
@@ -26,7 +27,12 @@ class FacilityListView(ListView):
             utilized_storage = 0
 
             for freezer in freezers:
-                boxes = freezer.boxes.all()
+                boxes = DimBox.objects.filter(
+                    Q(shelf__freezer=freezer) |
+                    Q(rack__shelf__freezer=freezer) |
+                    Q(rack__freezer=freezer) |
+                    Q(freezer=freezer)
+                )
 
                 freezer_capacity = sum(box.box_capacity for box in boxes)
                 facility_capacity += freezer_capacity
