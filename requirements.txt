@@ -11,11 +11,12 @@ django-extensions==3.2.3
 django-formtools==2.5.1
 django-js-reverse==0.10.2
 django-logentry-admin==1.1.0
+django-material-admin==1.8.6
 django-select2==8.1.2
 django-simple-history==3.5.0
 django-widget-tweaks==1.5.0
 docutils==0.20.1
-git+https://github.com/botswana-harvard/edc-base.git@develop#egg=edc-base
+-e git+ssh://git@github.com/edc-code-space/edc-base.git@74f3d34696c842f02b3fe3d527429b3db008ebc3#egg=edc_base
 Faker==23.2.1
 model-mommy==2.0.0
 packaging==23.2
