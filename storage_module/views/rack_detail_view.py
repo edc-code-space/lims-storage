@@ -16,31 +16,34 @@ class RackDetailView(DetailView):
     def post(self, request, *args, **kwargs):
         form = MoveBoxForm(request.POST)
         if form.is_valid():
-            rack = self.get_object()
-            box = rack.boxes.get(id=request.POST['box_id'])
-            box.freezer = form.cleaned_data.get('freezer')
-            box.shelf = form.cleaned_data.get('shelf')
-            box.rack = form.cleaned_data.get('rack')
-            box.save()
+            self.process_form(request, form)
         return super().get(request, *args, **kwargs)
+
+    def process_form(self, request, form):
+        rack = self.get_object()
+        box = rack.boxes.get(id=request.POST['box_id'])
+        box.freezer = form.cleaned_data.get('freezer')
+        box.shelf = form.cleaned_data.get('shelf')
+        box.rack = form.cleaned_data.get('rack')
+        box.save()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         rack = self.object
         boxes = rack.boxes.all()
-        move_box_form = MoveBoxForm()
+        context['inside_freezer'] = self.build_box_data(boxes)
+        context.update({
+            'type': 'rack',
+            'name': rack.rack_name,
+            'obj': rack,
+            'icon': 'fas fa-box-open',
+            'facility': self.get_facility(rack, boxes)
+        })
+        return context
 
-        facility = None
-        if rack.freezer:
-            facility = getattr(rack, 'freezer').facility
-        elif rack.shelf:
-            facility = getattr(rack, 'shelf').freezer.facility
-        elif boxes:
-            facility = boxes[0].facility
-
-        box_n_shelves_n_racks_data = []
-        for box in rack.boxes.all():
+    def build_box_data(self, boxes):
+        box_data = []
+        for box in boxes:
             samples_in_box = BoxPosition.objects.filter(box=box).count()
             if samples_in_box > 0:
                 _box = {
@@ -51,13 +54,15 @@ class RackDetailView(DetailView):
                     'capacity': box.box_capacity,
                     'stored_samples': samples_in_box,
                 }
-                box_n_shelves_n_racks_data.append(_box)
+                box_data.append(_box)
+        return box_data
 
-        context['inside_freezer'] = box_n_shelves_n_racks_data
-        context['type'] = 'rack'
-        context['name'] = rack.rack_name
-        context['obj'] = rack
-        context['icon'] = 'fas fa-box-open'
-        context['facility'] = facility
-
-        return context
+    def get_facility(self, rack, boxes):
+        facility = None
+        if rack.freezer:
+            facility = getattr(rack, 'freezer').facility
+        elif rack.shelf:
+            facility = getattr(rack, 'shelf').freezer.facility
+        elif boxes:
+            facility = boxes[0].facility
+        return facility

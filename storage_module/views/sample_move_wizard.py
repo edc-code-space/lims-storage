@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -75,13 +76,14 @@ class SampleMoveWizard(SessionWizardView):
         try:
             box_position = BoxPosition.objects.get(
                 sample=sample)
+        except BoxPosition.DoesNotExist:
+            BoxPosition.objects.create(sample=sample, box=box, x_position=x_position,
+                                       y_position=y_position)
+        else:
             box_position.box = box
             box_position.x_position = x_position
             box_position.y_position = y_position
             box_position.save()
-        except BoxPosition.DoesNotExist:
-            BoxPosition.objects.create(sample=sample, box=box, x_position=x_position,
-                                       y_position=y_position)
 
     def done(self, form_list, **kwargs):
         new_positions = []
@@ -92,12 +94,14 @@ class SampleMoveWizard(SessionWizardView):
                 box = form.initial.get('box')
                 sample_id = form.initial.get('sample_id')
 
+                new_x_position = int(cleaned_data["new_x_position"]) - 1
+
                 if self.validate_position(box, cleaned_data["new_x_position"],
                                           cleaned_data["new_y_position"]):
-                    form.add_error(None,
+                    messages.error(self.request,
                                    "The chosen position is already occupied. Please "
                                    "choose a different position.")
-                    return self.render(self.get_form())
+                    return self.render(form_list[-1])
 
                 sample = DimSample.objects.get(sample_id=sample_id)
                 new_positions.append({

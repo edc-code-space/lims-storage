@@ -77,16 +77,3 @@ def freezer_data(request, freezer_id):
     html = render_to_string("storage_module/child_box_detail.html",
                             {'inside_freezer': box_n_shelves_n_racks_data})
     return JsonResponse({'html': html})
-
-
-def sample_bulk_move(request):
-    if request.method == 'POST':
-        formset = SampleMoveFormSet(request.POST)
-        if formset.is_valid():
-            formset.save()
-    else:
-        selected_samples = request.GET['sample_ids'].split(',')
-        formset = SampleMoveFormSet(
-            queryset=BoxPosition.objects.filter(sample__in=selected_samples)
-        )
-    return render(request, 'move_samples.html', {'formset': formset})

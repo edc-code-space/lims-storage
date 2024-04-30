@@ -1,8 +1,7 @@
 from django import forms
 from django.db.models import Q
-from django.forms import BaseFormSet
 
-from storage_module.models import BoxPosition, DimBox, DimFacility, DimFreezer, DimRack, \
+from storage_module.models import DimBox, DimFacility, DimFreezer, DimRack, \
     DimShelf
 
 
@@ -92,5 +91,5 @@ class SampleMoveForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.box = kwargs.pop('box', None)
-        sample_ids = kwargs.pop('sample_ids', None)
+        self.sample_ids = kwargs.pop('sample_ids', None)
         super().__init__(*args, **kwargs)

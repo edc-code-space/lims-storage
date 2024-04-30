@@ -9,7 +9,6 @@ from storage_module.models import BoxPosition, DimBox, DimSample, Note
 class SampleDetailView(DetailView):
     model = DimSample
     template_name = 'storage_module/sample_detail.html'
-
     x_labels = [int(i) for i in range(1, 10)]
     y_labels = [chr(i) for i in range(ord('A'), ord('J'))]
 
@@ -20,32 +19,24 @@ class SampleDetailView(DetailView):
     def post(self, request, *args, **kwargs):
         form = MoveSampleForm(request.POST)
         if form.is_valid():
-            sample = self.get_object()
-
-            new_box = form.cleaned_data['box']
-            new_x = form.cleaned_data['x_position']
-            new_y = form.cleaned_data['y_position']
-
-            sample.box_position.box = new_box
-            sample.box_position.x_position = new_x
-            sample.box_position.y_position = new_y
-            sample.box_position.save()
+            sample_box_position = self.sample_position
+            sample_box_position.box = form.cleaned_data['box']
+            sample_box_position.x_position = form.cleaned_data['x_position']
+            sample_box_position.y_position = form.cleaned_data['y_position']
+            sample_box_position.save()
 
         note_content = request.POST.get('note')
         if note_content:
             user = request.user if request.user.is_authenticated else User.objects.get(
                 username='Guest')
             Note.objects.create(sample=self.get_object(), author=user, text=note_content)
-
         return super().get(request, *args, **kwargs)
+
+    def get_location(self, loc):
+        return self.box.location.get(loc, None) if self.box else None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        rack = self.box.location.get('rack', None) if self.box else None
-        shelf = self.box.location.get('shelf', None) if self.box else None
-        freezer = self.box.location.get('freezer', None) if self.box else None
-        facility = self.box.location.get('facility', None) if self.box else None
         initial = {'box': self.box.id} if self.box else {}
         move_sample_form = MoveSampleForm(
             initial=initial
@@ -53,10 +44,10 @@ class SampleDetailView(DetailView):
 
         context.update(
             box=self.box,
-            rack=rack,
-            shelf=shelf,
-            freezer=freezer,
-            facility=facility,
+            rack=self.get_location('rack'),
+            shelf=self.get_location('shelf'),
+            freezer=self.get_location('freezer'),
+            facility=self.get_location('facility'),
             sample=self.object,
             move_sample_form=move_sample_form,
             x_labels=self.x_labels,
