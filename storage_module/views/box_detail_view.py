@@ -1,5 +1,6 @@
 from urllib.parse import urlencode
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import DetailView
@@ -8,7 +9,7 @@ from storage_module.forms import MoveBoxForm
 from storage_module.models import DimBox, DimSampleStatus
 
 
-class BoxDetailView(DetailView):
+class BoxDetailView(LoginRequiredMixin, DetailView):
     model = DimBox
     template_name = 'storage_module/box_detail.html'
 

@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
@@ -6,7 +7,7 @@ from storage_module.forms import MoveSampleForm
 from storage_module.models import BoxPosition, DimBox, DimSample, Note
 
 
-class SampleDetailView(DetailView):
+class SampleDetailView(LoginRequiredMixin, DetailView):
     model = DimSample
     template_name = 'storage_module/sample_detail.html'
     x_labels = [int(i) for i in range(1, 10)]

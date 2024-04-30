@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
@@ -5,7 +6,7 @@ from django.views.generic import DetailView
 from ..models import BoxPosition, DimBox, DimFacility
 
 
-class FacilityDetailView(DetailView):
+class FacilityDetailView(LoginRequiredMixin, DetailView):
     model = DimFacility
     template_name = "storage_module/facility_detail.html"
     context_object_name = "facility"

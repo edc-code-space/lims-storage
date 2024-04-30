@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
 
@@ -5,7 +6,7 @@ from storage_module.forms import MoveBoxForm
 from storage_module.models import BoxPosition, DimRack
 
 
-class RackDetailView(DetailView):
+class RackDetailView(LoginRequiredMixin, DetailView):
     model = DimRack
     template_name = 'storage_module/freezer_detail.html'
 

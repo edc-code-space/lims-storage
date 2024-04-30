@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
@@ -7,7 +8,7 @@ from storage_module.models import DimBox, DimFacility, DimSample, DimSampleStatu
 from storage_module.views.view_mixin import ViewMixin
 
 
-class SamplesView(ViewMixin, TemplateView):
+class SamplesView(LoginRequiredMixin, ViewMixin, TemplateView):
     template_name = 'storage_module/samples.html'
 
     def get_context_data(self, **kwargs):

@@ -1,10 +1,11 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.views.generic import ListView
 
 from ..models import DimBox, DimFacility
 
 
-class FacilityListView(ListView):
+class FacilityListView(LoginRequiredMixin, ListView):
     model = DimFacility
     template_name = "storage_module/storage_view.html"
     context_object_name = "facility_data"

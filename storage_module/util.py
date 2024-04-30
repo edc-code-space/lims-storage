@@ -17,3 +17,20 @@ def get_available_positions(box):
     all_positions = range(1, max_position + 1)
     free_positions = [(p, p) for p in all_positions if (p, p) not in occupied_positions]
     return free_positions
+
+
+def get_data(input_list, url, icon, name, capacity, filter_obj):
+    data_list = []
+    for item in input_list:
+        item_samples = filter_obj.filter(box=item).count()
+        if item_samples > 0:
+            data = {
+                'id': item.id,
+                'url': url,
+                'icon': icon,
+                'name': name,
+                'capacity': capacity,
+                'stored_samples': item_samples,
+            }
+            data_list.append(data)
+    return data_list

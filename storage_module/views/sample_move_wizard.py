@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -9,7 +10,7 @@ from storage_module.forms import (BoxForm, FacilityForm, FreezerForm, SampleMove
 from storage_module.models import BoxPosition, DimBox, DimSample
 
 
-class SampleMoveWizard(SessionWizardView):
+class SampleMoveWizard(LoginRequiredMixin, SessionWizardView):
     form_list = [FacilityForm, FreezerForm, BoxForm, SampleMoveForm]
     template_name = 'storage_module/wizard/wizard_form.html'
 

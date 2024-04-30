@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
 
@@ -5,7 +6,7 @@ from ..forms import MoveBoxForm
 from ..models import (BoxPosition, DimShelf)
 
 
-class ShelfDetailView(DetailView):
+class ShelfDetailView(LoginRequiredMixin, DetailView):
     model = DimShelf
     template_name = 'storage_module/freezer_detail.html'
 
