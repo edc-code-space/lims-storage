@@ -30,8 +30,8 @@
                 scrollCollapse: true,
                 scrollY: '60vh',
                 columnDefs: [
-                    { targets: 0, orderable: false },  // Disables sorting on the first column
-                    { targets: 8, orderable: false },  // Disables sorting on the first column
+                    {targets: 0, orderable: false},  // Disables sorting on the first column
+                    {targets: 8, orderable: false},  // Disables sorting on the first column
                 ],
                 layout: {
                     topStart: {
@@ -67,10 +67,18 @@
             });
         });
     </script>
+
+    <style>
+        .container {
+            margin-left: 10rem;
+            min-height: 100vh;
+            margin: 0;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
-    <div class="container py-5">
+    <div class="container">
         <h1 class="mb-4">Samples</h1>
         <form id="bulk-actions-form" method="POST">
             {% csrf_token %}
@@ -186,12 +194,15 @@
                             <td>{{ sample.sample_id }}</td>
                             <td>{{ sample.sample_type__sample_type }}</td>
                             <td>
-                                <a {% if sample.box_position__box__freezer__facility__id %} href="{% url 'facility_detail' sample.box_position__box__freezer__facility__id %}" {% endif %}>{{ sample.box_position__box__freezer__facility__facility_name }}</a>
+                                <a
+                                        {% if sample.box_position__box__freezer__facility__id %}
+                                            href="{% url 'facility_detail' sample.box_position__box__freezer__facility__id %}" {% endif %}>{{ sample.box_position__box__freezer__facility__facility_name }}</a>
                             </td>
                             <td>{{ sample.source_file__source_file_name }}</td>
                             <td>
-                                <a {% if sample.box_position__box__id %} href="{% url 'box_detail' sample.box_position__box__id %}" {% endif %}>
-                                {{ sample.box_position__box__box_name }}
+                                <a {% if sample.box_position__box__id %}
+                                    href="{% url 'box_detail' sample.box_position__box__id %}" {% endif %}>
+                                    {{ sample.box_position__box__box_name }}
                                 </a>
                             </td>
                             <td>{{ sample.date_sampled }}</td>

@@ -5,12 +5,23 @@ from django.template.loader import render_to_string
 from django.views.generic import TemplateView
 
 from storage_module.models import (BoxPosition, DimFreezer, DimRack,
-                                   DimShelf)
+                                   DimSample, DimSampleType, DimShelf)
 from storage_module.util import get_data
 
 
 class HomeView(TemplateView):
     template_name = 'storage_module/home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_specimen'] = DimSample.objects.all().count()
+        context['specimen_types'] = DimSampleType.objects.all().count()
+        context['unique_participants'] = DimSample.objects.values(
+            'participant_id').distinct().count()
+        context['studies'] = DimSample.objects.values(
+            'protocol_number').distinct().count()
+
+        return context
 
 
 @login_required

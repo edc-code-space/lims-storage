@@ -1,52 +1,134 @@
 {% extends 'storage_module/base.html' %}
 
 {% block extra_script %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
     <script>
+        let url_template = "{% url 'facility_detail' '0000' %}";
+
+        function nameFormatter(value, row) {
+            let detail_url = url_template.replace('0000', row.id);
+            return `<a href="${detail_url}">${value}</a>`;
+        }
+
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
+
+            var data = {{ facility_data | safe }};
+
+            // Function to toggle between table and cards
+            function toggleView(showCards) {
+                if (showCards) {
+                    $('#cards-container').hide();
+                    $('#table-container').show();
+                } else {
+                    $('#table-container').hide();
+                    $('#cards-container').show();
+                }
+            }
+
+            // Initially, show table by default
+            toggleView(false);
+
+            // Handle toggle switch change event
+            $('#toggle-switch').change(function () {
+                toggleView($(this).prop('checked'));
+            });
+
+            // Initialize Bootstrap Table
+            $('#table').bootstrapTable({
+                data: data,
+            });
+
+            // Dynamically generate cards
+            let cardsHTML = '';
+            data.forEach(function (row) {
+                let detail_url = url_template.replace('0000', row.id);
+                cardsHTML += `
+                    <div class="card m-1" style="width: 40vw">
+                        <div class="card-body d-flex flex-row ">
+                            <div class="d-flex align-items-center pe-2">
+                                <h5 class="card-title">${row.facility_name}</h5>
+                            </div>
+                            <div class="d-flex flex-column w-75 border-start">
+                                <div class="d-flex align-items-end justify-content-end">
+                                    <a href="${detail_url}" class="btn btn-primary">View Details</a>
+                                </div>
+                                <div class="d-flex flex-row  justify-content-around">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <p>Box</p>
+                                        <p>100</p>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-center">
+                                        <p>Samples</p>
+                                        <p>100</p>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-center">
+                                        <p>Uterlised</p>
+                                        <p>${row.utilized_storage}</p>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-center">
+                                        <p>Capacity</p>
+                                        <p>${row.facility_capacity}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            $('#cards-container').html(cardsHTML);
         })
     </script>
-
 {% endblock %}
 
 {% block content %}
-    <div class="container py-3">
-        <h1>Storage Facilities</h1>
-        <table class="table mt-2">
-            <thead>
-            <tr>
-                <th scope="col">Facility Name</th>
-                <th scope="col">Total Capacity (Samples)
-                    <i class="fas fa-info-circle" data-toggle="tooltip"
-                       data-placement="top"
-                       title="The maximum number of samples that the facility can hold"></i>
-                </th>
-                <th scope="col">Utilized Storage (Samples)
-                    <i class="fas fa-info-circle" data-toggle="tooltip"
-                       data-placement="top"
-                       title="The number of samples currently stored in the facility"></i>
-                </th>
-                <th scope="col">Available Capacity (Samples)
-                    <i class="fas fa-info-circle" data-toggle="tooltip"
-                       data-placement="top"
-                       title="The number of additional samples that the facility can still accommodate based on its total capacity"></i>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for facility in facility_data %}
+    <div class="container py-5">
+        <div class="d-flex justify-content-center mb-3">
+            <h1>Storage Facilities</h1>
+        </div>
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="toggle-switch">
+            <label class="form-check-label" for="toggle-switch">Show Table</label>
+        </div>
+        <!-- Container for table -->
+        <div id="table-container" class="table-responsive">
+            <table id="table"
+                   data-search="true"
+                   data-search-on-enter-key="true"
+                   data-search-text="" class="table table-striped mt-2">
+                <thead class="thead-dark">
                 <tr>
-                    <td>
-                        <a href="{% url 'facility_detail' facility.id %}">
-                            {{ facility.facility_name }}
-                        </a>
-                    </td>
-                    <td>{{ facility.facility_capacity }}</td>
-                    <td>{{ facility.utilized_storage }}</td>
-                    <td>{{ facility.available_capacity }}</td>
+                    <th data-field="id">Facility ID</th>
+                    <th data-field="facility_name" data-formatter="nameFormatter">Facility
+                        Name
+                    </th>
+                    <th data-field="facility_capacity">Total Capacity (Samples) <i
+                            class="fas fa-info-circle" data-toggle="tooltip"
+                            data-placement="top"
+                            title="The maximum number of samples that the facility can hold"></i>
+                    </th>
+                    <th data-field="utilized_storage">Utilized Storage (Samples) <i
+                            class="fas fa-info-circle" data-toggle="tooltip"
+                            data-placement="top"
+                            title="The number of samples currently stored in the facility"></i>
+                    </th>
+                    <th data-field="available_capacity">Available Capacity (Samples)<i
+                            class="fas fa-info-circle" data-toggle="tooltip"
+                            data-placement="top"
+                            title="The number of additional samples that the facility can still accommodate based on its total capacity"></i>
+                    </th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+            </table>
+        </div>
+        <!-- Container for cards -->
+        <div id="cards-container" class="row"></div>
     </div>
 {% endblock %}

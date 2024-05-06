@@ -1,83 +1,177 @@
+{% load static %}
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Lab Storage Module</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BHHP Bio Repository</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp,container-queries"></script>
     <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-          crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-            crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-            crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
-            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-            crossorigin="anonymous"></script>
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        clifford: '#da373d',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+        }
+
+        .bg-gradient-blue {
+            background: linear-gradient(90deg, #cfe8fc 0%, #0070f3 100%);
+        }
+    </style>
 </head>
-<body>
-
-<!-- Navigation Bar -->
-{% include 'storage_module/navbar.html' %}
-
-<!-- Header Section -->
-<div class="jumbotron text-center">
-    <h1 class="display-4">Welcome to Lab Storage Module</h1>
-    <p class="lead">Your comprehensive solution for data management, real-time archiving
-        and tracking for your lab's samples.</p>
-    <hr class="my-4">
-    <p>Manage data, track samples, get real-time updates, follow regulatory compliance
-        standards and much more!</p>
-</div>
-
-<!-- Features Section -->
-<div class="container">
-    <h2 class="text-center my-4">Key Features</h2>
-    <div class="row">
-        <div class="col-sm-4 py-2">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Real-time Data Management</h5>
-                    <p class="card-text">Manage the lab samples' status, history, and
-                        other relevant data in real-time.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4 py-2">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Sample Tracking</h5>
-                    <p class="card-text">Track the current status and changes of sample
-                        data over time efficiently.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4 py-2">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <h5 class="card-title">User Access Management</h5>
-                    <p class="card-text">Manage access to data based on user roles
-                        ensuring data security and convenience.</p>
-                </div>
-            </div>
-        </div>
+<body class="flex flex-col h-screen justify-between">
+<header class="flex justify-between p-4">
+    <div class="flex flex-row space-x-2 justify-center items-center">
+        <img src="{% static "images/site_logo.png" %}" alt="site logo" class="w-7 h-7">
+        <p class="italic text-2xl font-bold text-cyan-500 font-sans">
+            BHHP Bio Repository
+        </p>
     </div>
-</div>
+    <nav class="flex space-x-4">
+        <a class="text-blue-500 hover:text-blue-800"
+           href="{% url 'home_url' %}">Home</a>
+        <a class="text-blue-500 hover:text-blue-800" href="{% url 'storage_view' %}">Storage
+            Facilities</a>
+        <a class="text-blue-500 hover:text-blue-800" href="{% url 'samples_url' %}">Samples</a>
+        <a class="text-blue-500 hover:text-blue-800" href="{% url 'reports_url' %}">Reports</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'admin:auth_user_change' user.id %}"
+               class="text-blue-500 hover:text-blue-800"
+               role="menuitem">Account</a>
+            <a href="{% url 'logout' %}" class="text-blue-500 hover:text-blue-800"
+               role="menuitem">Logout</a>
+        {% else %}
+            <a class="text-blue-500 hover:text-blue-800" href="{% url 'login' %}">
+                Sign In
+            </a>
+        {% endif %}
+        <a class="text-blue-500 hover:text-blue-800" href="{% url 'help_url' %}">Help</a>
+    </nav>
+</header>
+<main class="container mx-auto px-4 py-10 flex-grow">
+    <section class="flex relative justify-between items-center pb-4 h-96">
+        <div class="z-10 flex justify-between flex-col relative -mr-8">
+            <p class="text-8xl font-bold">
+                Botswana <br>
+                Harvard Health <br>
+                Partnership
+            </p>
+            <br>
+            <h1 class="text-sky-600 text-3xl font-light">LAB DATA-INSPIRED SOLUTION</h1>
+            <br>
+            <button type="button"
+                    class="bg-blue-500 w-32 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl">
+                Learn More
+            </button>
+        </div>
+        <div class="flex items-center space-x-4">
+            <img src="{% static "images/alt_dna.png" %}"
+                 alt="Botswana Harvard Health Partnership Logo"
+                 class="w-4/6 h-full absolute right-0 object-cover">
+        </div>
+    </section>
 
-<!-- About Section -->
-<div class="container my-5">
-    <h2>About</h2>
-    <p>The Lab Storage Module is a critical component of the Laboratory Information
-        Management System (LIMS) designed to manage and manipulate archived samples data
-        in real-time.</p>
-</div>
+    <div class="border-b my-9">
+        <p>
+            Our Portfolio
+        </p>
+    </div>
 
-<!-- Footer -->
-<footer class="footer bg-dark text-white text-center py-3 ">
-    <p>© 2024 Laboratory Information Management System</p>
+    <section class="flex flex-row justify-center space-x-48">
+        <div class="text-center text-3xl flex items-center justify-center transform translate-y-5">
+            <div>
+                <p class="font-bold">{{ total_specimen }}</p>
+                <p>Total Specimen</p>
+            </div>
+        </div>
+        <div class="text-center bg-gradient-to-r from-blue-200 rounded-full -mr-16 w-40 h-40 flex items-center justify-center transform translate-y-3">
+            <div>
+                <p class="font-bold">{{ specimen_types }}</p>
+                <p>Specimen Types</p>
+            </div>
+        </div>
+        <div class="text-center bg-gradient-to-r from-blue-500 to-blue-200 rounded-full text-white top-16 w-40 h-40 flex items-center justify-center transform translate-y-4">
+            <div>
+                <p class="font-bold">{{ unique_participants }}</p>
+                <p>Unique participants</p>
+            </div>
+        </div>
+        <div class="text-center bg-gradient-to-r from-blue-500 to-blue-200 rounded-full text-white w-28 h-28 flex items-center justify-center transform translate-y-5">
+            <div>
+                <p class="font-bold">{{ studies }}</p>
+                <p>Studies</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="border-b my-9">
+        <p>
+            Key Features
+        </p>
+    </div>
+
+    <section class="grid grid-cols-3 gap-4 divide-y">
+        <div class="bg-blue-100 p-4 rounded-2xl flex flex-col justify-between space-y-4">
+            <div>
+                <i class="fas fa-database"></i>
+                <p class="text-3xl">Data Management</p>
+                <p class="text-slate-500">
+                    Manage the lab samples status, history, and other relevant data in
+                    real-time
+                </p>
+            </div>
+            <div class="mt-auto ml-auto">
+                <p>View More</p>
+                <i class="fas fa-arrow-up-right-from-square"></i>
+            </div>
+        </div>
+        <div class="bg-blue-100 p-4 rounded-2xl flex flex-col justify-between space-y-4">
+            <div>
+                <i class="fas fa-search-location"></i>
+                <p class="text-3xl">Sample Tracking</p>
+                <p class="text-slate-500">Efficiently track the status and changes of
+                    samples
+                    over time.</p>
+            </div>
+            <div class="mt-auto ml-auto">
+                <p>View More</p>
+                <i class="fas fa-arrow-up-right-from-square"></i>
+            </div>
+        </div>
+        <div class="bg-blue-100 p-4 rounded-2xl flex flex-col justify-between space-y-4">
+            <div>
+                <i class="fas fa-lock"></i>
+                <p class="text-3xl">User Access Management</p>
+                <p class="text-slate-500">Manage access to data based on user roles
+                    ensuring
+                    data security and
+                    convenience</p>
+            </div>
+            <div class="mt-auto ml-auto">
+                <p>View More</p>
+                <i class="fas fa-arrow-up-right"></i>
+            </div>
+        </div>
+    </section>
+</main>
+<footer class="w-full bg-blue-950 text-white py-5 mt-5">
+    <div class="text-center">
+        <p>© 2024 Laboratory Information Management System</p>
+    </div>
 </footer>
-
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>

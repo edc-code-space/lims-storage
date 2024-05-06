@@ -13,12 +13,18 @@
             });
         });
     </script>
+    <style>
+        .container {
+            margin-left: 10rem;
+            min-height: 100vh;
+            margin: 0;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
     <div class="container">
-        <div class="breadcrumb mt-2">
-
+        <div class="breadcrumb mt-3 mb-5">
             {% if facility %}
                 <a href="{% url 'facility_detail' facility.id %}" class="breadcrumb-item">
                     <i class="fas fa-building"></i> {{ facility.facility_name }}
