@@ -1,0 +1,207 @@
+{% extends 'storage_module/base.html' %}
+{% load storage_module_extras %}
+
+{% block extra_script %}
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+        });
+    </script>
+
+    <style>
+        .select2-container--default .select2-selection--single {
+            width: 465px !important; /* Set the width to your preference */
+        }
+
+        @media (min-width: 992px) {
+            .sidebar {
+                width: 330px;
+                padding: 20px;
+                border-left: 1px solid #ddd;
+            }
+        }
+        .container {
+            margin-left: 10rem;
+            min-height: 100vh;
+            margin: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <main class="container py-3">
+        <div class="row">
+            <!-- Main content -->
+            <div class="col-lg-9">
+                <!-- Sample Hierarchy -->
+                <div class="my-4">
+                    <h1>Sample Hierarchy</h1>
+                    <ul class="list-group mt-3">
+                        <li class="list-group-item">
+                            {% if box.location.facility %}
+                                <i class="fas fa-warehouse"></i>
+                                <a href="{% url 'facility_detail' box.location.facility.id %}">{{ box.location.facility.facility_name }}</a>
+                            {% endif %}
+                            {% if box.location.freezer %}
+                                <ul class="list-group">
+                                <li class="list-group-item">
+                                <i class="fas fa-snowflake"></i>
+                                <a href="{% url 'freezer_detail' box.location.freezer.id %}">{{ box.location.freezer.freezer_name }}</a>
+                            {% endif %}
+                            {% if box.location.shelf %}
+                                <ul class="list-group">
+                                <li class="list-group-item">
+                                <i class="fas fa-layer-group"></i>
+                                <a href="{% url 'shelf_detail' box.location.shelf.id %}">{{ box.location.shelf.shelf_name }}</a>
+                            {% endif %}
+                            {% if box.location.rack %}
+                                <ul class="list-group">
+                                <li class="list-group-item">
+                                <i class="fas fa-box-open"></i>
+                                <a href="{% url 'rack_detail' box.location.rack.id %}">{{ box.location.rack.rack_name }}</a>
+                            {% endif %}
+                            {% if box %}
+                                <ul class="list-group">
+                                    <li class="list-group-item">
+                                        <i class="fas fa-cube"></i>
+                                        <a href="{% url 'box_detail' box.id %}">{{ box.box_name }}</a>
+                                        <ul class="list-group mt-2">
+                                            <li class="list-group-item">
+                                                <!-- Box Capacity for 10 x 10 grid -->
+                                                <ul class="list-group mt-3">
+                                                    <h2>Box Positions:</h2>
+                                                    <table class="table mt-2">
+                                                        <thead>
+                                                        <tr>
+                                                            <th scope="col">#</th>
+                                                            {% for x in x_labels %}
+                                                                <th scope="col">{{ x }}</th>
+                                                            {% endfor %}
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        {% for y in y_labels %}
+                                                            <tr>
+                                                                <th scope="row">{{ y }}</th>
+                                                                {% for x in x_labels %}
+                                                                    <td>
+                                                                        {% if sample_position.x_position == forloop.counter0 and sample_position.y_position == y %}
+                                                                            <i class="fas fa-vial"></i>
+                                                                        {% endif %}
+                                                                    </td>
+                                                                {% endfor %}
+                                                            </tr>
+                                                        {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            {% else %}
+                                <div class="alert alert-danger" role="alert">The
+                                    sample is not in
+                                    storage.
+                                </div>
+                            {% endif %}
+                            {% if box.location.rack %}
+                                </li>
+                                </ul>
+                            {% endif %}
+                            {% if box.location.shelf %}
+                                </li>
+                                </ul>
+                            {% endif %}
+                            {% if box.location.freezer %}
+                                </li>
+                                </ul>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="col-lg-3">
+                <div class="sidebar">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h2 class="card-title">{{ sample.sample_id }}'s
+                                Information</h2>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <strong>Type:</strong> {{ sample.sample_type.sample_type }}
+                                </li>
+                                <li class="list-group-item"><strong>Source
+                                    File:</strong> {{ sample.source_file.source_file_name }}
+                                </li>
+                                <li class="list-group-item"><strong>Time
+                                    Sampled:</strong> {{ sample.time_sampled }}</li>
+                                <li class="list-group-item">
+                                    <strong>Condition:</strong> {{ sample.sample_condition }}
+                                </li>
+                                <li class="list-group-item"><strong>Created
+                                    By:</strong> {{ sample.user_created }}</li>
+                                <li class="list-group-item"><strong>Participant
+                                    ID:</strong> {{ sample.participant_id }}</li>
+                                <li class="list-group-item">
+                                    <strong>Gender:</strong> {{ sample.gender }}</li>
+                                <li class="list-group-item"><strong>Date of
+                                    Birth:</strong> {{ sample.date_of_birth }}</li>
+                                <li class="list-group-item"><strong>Date
+                                    Sampled:</strong> {{ sample.date_sampled }}</li>
+                                <li class="list-group-item"><strong>Requisition
+                                    ID:</strong> {{ sample.requisition_id }}</li>
+                                <li class="list-group-item"><strong>Protocol
+                                    Number:</strong> {{ sample.protocol_number }}</li>
+                                <li class="list-group-item"><strong>Status:</strong> <span
+                                        class="badge badge-secondary">{{ sample.sample_status.name }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- Actions and Notes -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
+                        <button type="button" class="btn btn-success">Share</button>
+                        <button type="button" class="btn btn-warning">Export</button>
+                        <a href="/move_samples/?sample_ids={{ sample.sample_id }}"
+                           class="btn btn-primary" role="button">
+                            Move Sample
+                        </a>
+                    </div>
+
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h2 class="card-title">Notes</h2>
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                        <textarea class="form-control" name="note"
+                                  placeholder="Add a note.."></textarea>
+                                </div>
+                                <input type="submit" class="btn btn-primary"
+                                       value="Save Note">
+                            </form>
+
+                            {% for note in sample.notes.all %}
+                                <div class="card mt-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ note.author.username }}</h5>
+                                        <p class="card-subtitle text-muted">Posted
+                                            on {{ note.created_date }}</p>
+                                        <p class="card-text">{{ note.text }}</p>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <p>No notes yet.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+        </div>
+        </aside>
+        </div>
+    </main>
+{% endblock %}

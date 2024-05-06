@@ -1,0 +1,18 @@
+{% extends 'storage_module/base.html' %}
+{% load storage_module_extras %}
+
+
+{% block content %}
+
+    <form id="bulk-actions-form" method="post">
+        {{ formset.management_form }}
+        {% for form in formset %}
+            <div>
+                Sample {{ forloop.counter }}
+                {{ form }}
+            </div>
+        {% endfor %}
+        <button type="submit">Move Samples</button>
+    </form>
+
+{% endblock %}

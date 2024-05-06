@@ -1,0 +1,64 @@
+{% extends 'storage_module/base.html' %}
+{% load storage_module_extras %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <body>
+    <div class="container mt-5">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Move Samples: Step {{ wizard.steps.step1 }}
+                    of {{ wizard.steps.count }}</h2>
+                <button type="button"
+                        class="btn btn-sm btn-outline-light"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Help">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+            <form method="POST" class="card-body">
+                {% csrf_token %}
+                {{ wizard.management_form }}
+                {% if wizard.form.forms %}
+                    {{ wizard.form.management_form }}
+                    {% for form in wizard.form %}
+                        <div class="form-group mb-3">
+                            <div><strong>Sample {{ forloop.counter }}</strong></div>
+                            {% if form is not None and form.fields %}
+                                {{ form }}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {% for field in wizard.form %}
+                        <div class="form-group mb-3">
+                            {{ field.label_tag }}
+                            {{ field|add_class:"form-control form-control-sm" }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-outline-secondary"
+                            type="submit"
+                            name="wizard_goto_step"
+                            value="{{ wizard.steps.prev }}"
+                            {% if not wizard.steps.prev %}
+                            disabled
+                            {% endif %}>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn btn-primary" type="submit">Next <i
+                            class="fas fa-arrow-right"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+    </body>
+{% endblock %}

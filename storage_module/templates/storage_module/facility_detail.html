@@ -1,0 +1,118 @@
+{% extends 'storage_module/base.html' %}
+{% load storage_module_extras %}
+
+{% block extra_script %}
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var table = $('#facilityTable').DataTable({
+                dom: 'Bfrtip',
+                paging: false,
+                scrollCollapse: true,
+                scrollY: '60vh',
+                "columns": [
+                    {
+                        "className": 'details-control',
+                        "orderable": false,
+                        "data": null,
+                        "defaultContent": ''
+                    },
+                    {"data": "col1"},
+                    {"data": "col2"},
+                    {"data": "col3"},
+                ],
+                "order": [[1, 'asc']]
+            });
+
+
+            $(document).on('click', '#facilityTable tbody td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var row = table.row(tr);
+
+                if (row.child.isShown()) {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    var linkHtml = $($.parseHTML(row.data().col1));
+                    var link = linkHtml.filter('a').attr('href');
+                    format(link, row);
+                    tr.addClass('shown');
+                }
+            });
+        });
+
+        /* Formatting function for row details */
+        function format(rowData, row) {
+            var div = $('<div/>').addClass('loading').text('Loading...');
+
+            var link = rowData;
+
+            var regex = /\/freezer\/(\d+)\//;
+            var match = link.match(regex);
+            var id = match ? match[1] : null;
+
+
+            $.ajax({
+                url: "/freezer_data/" + id + "/",   // Use id in the url
+                dataType: 'json',
+                success: function (json) {
+                    div.html(json.html).removeClass('loading');
+                    row.child(div).show();
+                }
+            });
+            return div;
+        }
+    </script>
+
+    <link href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css"
+          rel="stylesheet">
+
+    <style>
+        td.details-control {
+            background: url('https://datatables.net/examples/resources/details_open.png') no-repeat center center;
+            cursor: pointer;
+        }
+
+        tr.shown td.details-control {
+            background: url('https://datatables.net/examples/resources/details_close.png') no-repeat center center;
+        }
+
+        .container {
+            margin-left: 10rem;
+            min-height: 100vh;
+            margin: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2 style="margin-top: 1rem; margin-bottom: 1rem">Facility: {{ object.facility_name }}</h2>
+        <table id="facilityTable" class="display" style="width:100%">
+            <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Capacity</th>
+                <th>Stored Samples</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for freezer_data in facility_data %}
+                <tr>
+                    <td class="details-control"></td>
+                    <td>
+                        <i class="fas toggle-icon"
+                           style="transition: transform 0.3s;"></i>
+                        <i class="fas fa-snowflake"></i>
+                        <a href="{% url 'freezer_detail' freezer_data.freezer.id %}">{{ freezer_data.freezer.freezer_name }}</a>
+                    </td>
+                    <td>{{ freezer_data.freezer_total_capacity }}</td>
+                    <td>{{ freezer_data.freezer_total_samples }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

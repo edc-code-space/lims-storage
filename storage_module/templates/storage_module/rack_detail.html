@@ -1,0 +1,115 @@
+{% extends 'storage_module/base.html' %}
+
+
+{% block extra_script %}
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+        });
+        $(document).ready(function () {
+            var table = $('#rack-table').DataTable({
+                dom: 'Bfrtip',
+                paging: false,
+                scrollCollapse: true,
+                scrollY: '60vh',
+                "order": [[1, 'asc']]
+            });
+        });
+    </script>
+    <style>
+        .select2-container--default .select2-selection--single {
+            width: 465px !important; /* Set the width to your preference */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container py-3">
+        <h1>{{ dash_name }} Dashboard: {{ obj_name }}</h1>
+
+        <!-- List the Boxes on the Shelf -->
+        <h2>Boxes on this {{ dash_name }}</h2>
+        <table id="rack-table" class="table mt-2">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Box Name</th>
+                <th scope="col">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for box in boxes %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>
+                        <!-- Box details with link to the box's detail view -->
+                        <a href="{% url 'box_detail' box.id %}">
+                            {{ box.box_name }}
+                        </a>
+                    </td>
+                    <td>
+                        <!-- Button to open the move box form for this box -->
+                        <button type="button" class="btn btn-primary"
+                                data-toggle="modal"
+                                data-target="#moveBoxModal{{ box.id }}">
+                            Move Box
+                        </button>
+
+                        <!-- Modal for moving box -->
+                        <div class="modal fade" id="moveBoxModal{{ box.id }}"
+                             tabindex="-1" aria-labelledby="moveBoxModalLabel{{ box.id }}"
+                             aria-hidden="true">
+                            <div class="modal-dialog">
+                                <form method="POST">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title"
+                                                id="moveBoxModalLabel{{ box.id }}">Move
+                                                Box: {{ box.box_name }}</h5>
+                                            <button type="button" class="btn-close"
+                                                    data-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                {{ move_box_form.freezer.label_tag }}
+                                                {{ move_box_form.freezer }}
+                                            </div>
+                                            <div class="form-group">
+                                                {{ move_box_form.shelf.label_tag }}
+                                                {{ move_box_form.shelf }}
+                                            </div>
+                                            <div class="form-group">
+                                                {{ move_box_form.rack.label_tag }}
+                                                {{ move_box_form.rack }}
+                                            </div>
+                                            <input type="hidden" name="box_id"
+                                                   value="{{ box.id }}">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button"
+                                                    class="btn btn-secondary"
+                                                    data-dismiss="modal">Close
+                                            </button>
+                                            <button type="submit"
+                                                    class="btn btn-primary">
+                                                Update Location
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3">No boxes on this shelf.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}

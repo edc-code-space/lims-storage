@@ -1,0 +1,207 @@
+<!-- base.html -->
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Lab Storage Module{% endblock %}</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+          rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/2.0.5/css/dataTables.dataTables.css"/>
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/buttons/2.0.5/css/buttons.dataTables.min.css"/>
+    <script src="https://cdn.datatables.net/2.0.5/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.5/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.5/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.5/js/buttons.print.min.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/v/dt/jq-3.3.1/jszip-2.5.0/dt-1.11.3/b-2.2.1/b-html5-2.2.1/b-print-2.2.1/datatables.min.css"/>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/v/dt/jq-3.3.1/jszip-2.5.0/dt-1.11.3/b-2.2.1/b-html5-2.2.1/b-print-2.2.1/datatables.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha384-/xUj+3OJU5yExlq6GSYGSHk7tPXikysD6nO9sbKb8f4TdrollmUj3zKvk/3e+944"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/bootstrap-table.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/bootstrap-table.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@coreui/coreui@5.0.0/dist/css/coreui.min.css"
+          rel="stylesheet"
+          integrity="sha384-KGkYqG3gD435LMZAC/8byquZiD5665LheNozmHAqp8vrOKBaBL/bFUO5Er5tMRNi"
+          crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@coreui/coreui@5.0.0/dist/js/coreui.bundle.min.js"
+            integrity="sha384-Wl6mLWl+C0OgKzQqXtoEXuTkm2RwXManFDTNyMRxPR5zh3DFIUIDhq7Fp1JCFm1V"
+            crossorigin="anonymous"></script>
+    <link href="https://unpkg.com/@coreui/icons/css/free.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/bootstrap-table.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.29.0/tableExport.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/bootstrap-table.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/bootstrap-table-locale-all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/extensions/export/bootstrap-table-export.min.js"></script>
+
+    {% block extra_script %}{% endblock %}
+    {% block custom_head %}{% endblock %}
+
+    <script>
+        $(document).ready(function () {
+            $("#sidebarToggle").click(function () {
+                $("#mySidebar").toggleClass('sidebar-wide sidebar-narrow ');
+                $("#brandText").toggleClass('d-none');
+            });
+        });
+    </script>
+
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .sidebar-wide {
+            height: 100vh;
+            width: 200px;
+            transition: width .3s;
+        }
+
+        .sidebar-narrow {
+            height: 100vh;
+            width: 50px;
+            transition: width .3s;
+        }
+
+        .custom-bg {
+            background-color: #3AA3F5;
+            padding: 10px;
+        }
+
+        .log-out_container {
+            background-color: #FFFFFF;
+            border-radius: 20%;
+            justify-content: space-between;
+            padding: 10px;
+            height: 45px;
+            align-items: center;
+            display: flex;
+        }
+
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+
+</head>
+
+<body>
+<!-- Navigation Bar -->
+<div class="flex">
+    <div class="sidebar sidebar-wide border-end" id="mySidebar">
+        <div class="sidebar-header border-bottom" id="sidebarToggle">
+            <div class="sidebar-brand">
+                <img src="{% static "images/site_logo.png" %}" alt="site logo"
+                     style="width:30px;height:30px;"/>
+                <span id="brandText">BHHP Bio Repository</span>
+            </div>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'home_url' %}">
+                    <i class="nav-icon cil-home"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'storage_view' %}">
+                    <i class="nav-icon cil-building"></i> Storage Facilities
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'samples_url' %}">
+                    <i class="nav-icon cil-flask"></i> Samples
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'reports_url' %}">
+                    <i class="nav-icon cil-chart-pie"></i> Reports
+                </a>
+            </li>
+            <div class="mt-auto custom-bg rounded">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin:auth_user_change' user.id %}">
+                        <i class="nav-icon cil-user"></i> Account Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'help_url' %}">
+                        <i class="nav-icon cil-info"></i>Help
+                    </a>
+                </li>
+                <li class="flex flex-row rounded log-out_container">
+                    <i class="nav-icon cil-user"></i>
+                    <div class="flex flex-col ">
+                        <p style="font-size: 10px; height: 5px">{{ user.username }}</p>
+                        <p style="font-size: 10px; height: 5px">{{ user.email }}</p>
+                    </div>
+                    <a href="{% url 'logout' %}"><i class="cil-exit-to-app"></i></a>
+                </li>
+            </div>
+        </ul>
+    </div>
+
+    {% block messages %}
+        {% if messages %}
+            <div class="container mt-4 mb-4">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show"
+                         role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endblock %}
+    <!-- Main content of the page -->
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>
