@@ -26,8 +26,6 @@ SECRET_KEY = 'django-insecure-+mdx-9+^j)2@x-6a*a465+xmu35dy_iz&n+w=f-!vjf2ayz!#j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
 APP_NAME = 'storage_module'
 
 ETC_DIR = os.path.join('/etc/', APP_NAME)
@@ -156,3 +154,12 @@ MESSAGE_TAGS = {
     message_constants.WARNING: 'alert-warning',
     message_constants.ERROR: 'alert-danger',
 }
+
+
+ALLOWED_HOSTS = ['http://*', 'https://*']
+CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
+SESSION_COOKIE_DOMAIN = 'datawarehouse.bhp.org.bw'
+CSRF_COOKIE_DOMAIN = 'datawarehouse.bhp.org.bw'
