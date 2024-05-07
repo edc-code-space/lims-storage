@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import configparser
-from pathlib import Path
 import os
+from pathlib import Path
+
 from django.contrib.messages import constants as message_constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,8 +26,6 @@ SECRET_KEY = 'django-insecure-+mdx-9+^j)2@x-6a*a465+xmu35dy_iz&n+w=f-!vjf2ayz!#j
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = []
 
 APP_NAME = 'storage_module'
 
@@ -156,3 +155,11 @@ MESSAGE_TAGS = {
     message_constants.WARNING: 'alert-warning',
     message_constants.ERROR: 'alert-danger',
 }
+
+ALLOWED_HOSTS = ['http://datawarehouse.bhp.org.bw', 'https://datawarehouse.bhp.org.bw']
+CSRF_TRUSTED_ORIGINS = ['http://datawarehouse.bhp.org.bw', 'https://datawarehouse.bhp.org.bw']
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
+SESSION_COOKIE_DOMAIN = 'datawarehouse.bhp.org.bw'
+CSRF_COOKIE_DOMAIN = 'datawarehouse.bhp.org.bw'
