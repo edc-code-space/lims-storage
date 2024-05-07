@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import configparser
 from pathlib import Path
 import os
 from django.contrib.messages import constants as message_constants
@@ -29,6 +29,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 APP_NAME = 'storage_module'
+
+ETC_DIR = os.path.join('/etc/', APP_NAME)
 
 LOGIN_REDIRECT_URL = 'home_url'
 
@@ -85,10 +87,23 @@ WSGI_APPLICATION = 'storage_module.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+mysql_config = configparser.ConfigParser()
+mysql_config.read(os.path.join(ETC_DIR, 'mysql.ini'))
+
+HOST = mysql_config['mysql']['host']
+DB_USER = mysql_config['mysql']['user']
+DB_PASSWORD = mysql_config['mysql']['password']
+DB_NAME = mysql_config['mysql']['database']
+PORT = mysql_config['mysql']['port']
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': HOST,
+        'PORT': PORT,
     }
 }
 
