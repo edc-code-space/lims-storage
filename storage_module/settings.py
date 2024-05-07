@@ -156,8 +156,10 @@ MESSAGE_TAGS = {
     message_constants.ERROR: 'alert-danger',
 }
 
-ALLOWED_HOSTS = ['http://datawarehouse.bhp.org.bw', 'https://datawarehouse.bhp.org.bw']
-CSRF_TRUSTED_ORIGINS = ['http://datawarehouse.bhp.org.bw', 'https://datawarehouse.bhp.org.bw']
+ALLOWED_HOSTS = ['127.0.0.1', 'http://datawarehouse.bhp.org.bw',
+                 'https://datawarehouse.bhp.org.bw']
+CSRF_TRUSTED_ORIGINS = ['http://datawarehouse.bhp.org.bw',
+                        'https://datawarehouse.bhp.org.bw']
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
