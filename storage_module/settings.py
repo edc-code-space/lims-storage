@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import configparser
-from pathlib import Path
 import os
+from pathlib import Path
+
 from django.contrib.messages import constants as message_constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -154,7 +155,6 @@ MESSAGE_TAGS = {
     message_constants.WARNING: 'alert-warning',
     message_constants.ERROR: 'alert-danger',
 }
-
 
 ALLOWED_HOSTS = ['http://*', 'https://*']
 CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
