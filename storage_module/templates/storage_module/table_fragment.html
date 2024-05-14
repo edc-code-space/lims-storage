@@ -1,0 +1,26 @@
+<table id="facilityTable" class="display" style="width:100%">
+    <thead>
+    <tr>
+        <th></th>
+        <th>Name</th>
+        <th>Capacity</th>
+        <th>Stored Samples</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for freezer_data in facility_data %}
+        <tr>
+            <td class="details-control"></td>
+            <td>
+                <i class="fas toggle-icon"
+                   style="transition: transform 0.3s;"></i>
+                <i class="fas fa-snowflake"></i>
+                <a href="{% url 'freezer_detail' freezer_data.freezer.id %}">{{ freezer_data.freezer.freezer_name }}</a>
+            </td>
+            <td>{{ freezer_data.freezer_total_capacity }}</td>
+            <td>{{ freezer_data.freezer_total_samples }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -2,9 +2,9 @@
 {% load storage_module_extras %}
 
 {% block extra_script %}
-    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function () {
+
             var table = $('#facilityTable').DataTable({
                 dom: 'Bfrtip',
                 paging: false,
@@ -39,6 +39,17 @@
                     tr.addClass('shown');
                 }
             });
+
+
+            $('#toggle-switch').change(function () {
+                if (this.checked) {
+                    $('#cards-container').hide();
+                    $('#table-container').show();
+                } else {
+                    $('#table-container').hide();
+                    $('#cards-container').show();
+                }
+            }).change();
         });
 
         /* Formatting function for row details */
@@ -64,9 +75,6 @@
         }
     </script>
 
-    <link href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css"
-          rel="stylesheet">
-
     <style>
         td.details-control {
             background: url('https://datatables.net/examples/resources/details_open.png') no-repeat center center;
@@ -87,32 +95,18 @@
 
 {% block content %}
     <div class="container">
-        <h2 style="margin-top: 1rem; margin-bottom: 1rem">Facility: {{ object.facility_name }}</h2>
-        <table id="facilityTable" class="display" style="width:100%">
-            <thead>
-            <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Capacity</th>
-                <th>Stored Samples</th>
-            </tr>
-            </thead>
+        <h2 style="margin-top: 1rem; margin-bottom: 1rem">
+            Facility: {{ object.facility_name }}</h2>
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="toggle-switch">
+            <label class="form-check-label" for="toggle-switch">Show Table</label>
+        </div>
+        <div id="table-container" class="table-responsive">
+            {{ tableHTML|safe }}
+        </div>
 
-            <tbody>
-            {% for freezer_data in facility_data %}
-                <tr>
-                    <td class="details-control"></td>
-                    <td>
-                        <i class="fas toggle-icon"
-                           style="transition: transform 0.3s;"></i>
-                        <i class="fas fa-snowflake"></i>
-                        <a href="{% url 'freezer_detail' freezer_data.freezer.id %}">{{ freezer_data.freezer.freezer_name }}</a>
-                    </td>
-                    <td>{{ freezer_data.freezer_total_capacity }}</td>
-                    <td>{{ freezer_data.freezer_total_samples }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <div id="cards-container" class="row">
+            {{ cardsHTML|safe }}
+        </div>
     </div>
 {% endblock %}

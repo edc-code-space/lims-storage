@@ -22,6 +22,7 @@ from storage_module import views
 from storage_module.views import BoxDetailView, FacilityDetailView, FacilityListView, \
     FreezerDetailView, HomeView, RackDetailView, SampleDetailView, SamplesView, \
     ShelfDetailView, SampleMoveWizard
+from storage_module.views.views import DashboardView
 
 urlpatterns = [
     path('accounts/', include('edc_base.auth.urls')),
@@ -39,9 +40,11 @@ urlpatterns = [
     path('freezer_data/<int:freezer_id>/', views.freezer_data, name='freezer_data'),
     path('facility/<str:facility_id>/', FacilityDetailView.as_view(),
          name='facility_detail'),
+    path('get_sample_details/<str:sample_id>', views.get_sample_details,
+         name='get_sample_details'),
     path('move_samples/', SampleMoveWizard.as_view(), name='move_samples'),
     path('reports/', HomeView.as_view(), name='reports_url'),
-    path('dashboard/', HomeView.as_view(), name='dashboard_url'),
+    path('dashboard/', DashboardView.as_view(), name='dashboard_url'),
     path('storage_view/', FacilityListView.as_view(), name='storage_view'),
     path('select2/', include('django_select2.urls')),
     path('help/', HomeView.as_view(), name='help_url'),

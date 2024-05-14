@@ -34,3 +34,43 @@ def get_data(input_list, url, icon, name, capacity, filter_obj):
             }
             data_list.append(data)
     return data_list
+
+
+def get_stored_samples(box):
+    samples_in_box = BoxPosition.objects.filter(box=box).count()
+    return samples_in_box
+
+
+def get_data_dict(id, url, icon, name, capacity, stored_samples):
+    return {
+        'id': id,
+        'url': url,
+        'icon': icon,
+        'name': name,
+        'capacity': capacity,
+        'stored_samples': stored_samples
+    }
+
+
+def append_if_samples(box, data_list, url, icon, name):
+    samples_in_box = get_stored_samples(box)
+    if samples_in_box > 0:
+        _box = get_data_dict(box.id, url, icon, name, box.box_capacity, samples_in_box)
+        data_list.append(_box)
+
+
+def append_entity_info(entities, data_list, url, icon, name_attr):
+    for entity in entities:
+        capacity = 0
+        stored_samples = 0
+        for box in entity.boxes.all():
+            samples_in_box = get_stored_samples(box)
+            if samples_in_box > 0:
+                capacity += box.box_capacity
+                stored_samples += samples_in_box
+        if stored_samples > 0:
+            entity_dict = get_data_dict(entity.id, url, icon, getattr(entity, name_attr),
+                                        capacity, stored_samples)
+            data_list.append(entity_dict)
+
+
