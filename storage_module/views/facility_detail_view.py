@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 from django.views.generic import DetailView
 
 from ..models import BoxPosition, DimBox, DimFacility
@@ -40,6 +41,9 @@ class FacilityDetailView(LoginRequiredMixin, DetailView):
         facility = self.object
         facility_data = []
 
+        context['cardsHTML'] = ''
+        context['tableHTML'] = ''
+
         for freezer in facility.dimfreezer_set.all():
             boxes = DimBox.objects.filter(
                 Q(shelf__freezer=freezer) |
@@ -49,40 +53,54 @@ class FacilityDetailView(LoginRequiredMixin, DetailView):
             )
             freezer_data = {'freezer': freezer}
             box_n_shelves_n_racks_data = []
+            freezer_aggregated_boxes = []
+            freezer_stored_samples = 0
 
             freezer_total_samples = sum(len(box.get_samples()) for box in boxes)
             freezer_total_capacity = sum(box.box_capacity for box in boxes)
             selected_box_ids = freezer.boxes.all().values_list('id', flat=True)
 
-            aggregated_boxes, _, _ = self._aggregate_boxes(
-                freezer.boxes.filter(shelf=None, rack=None), 'box_detail', 'fas fa-cube')
+            aggregated_boxes, aggregated_boxes_capacity, aggregated_boxes_samples = (
+                self._aggregate_boxes(freezer.boxes.filter(shelf=None, rack=None),
+                                       'box_detail', 'fas fa-cube'))
             box_n_shelves_n_racks_data += aggregated_boxes
-
+            freezer_aggregated_boxes += aggregated_boxes
+            freezer_stored_samples += aggregated_boxes_samples
             for shelf in freezer.shelves.all():
                 aggregated_boxes, capacity, stored_samples = self._aggregate_boxes(
                     shelf.boxes.all(), 'shelf_detail', 'fas fa-layer-group')
                 box_n_shelves_n_racks_data += aggregated_boxes
+                freezer_aggregated_boxes += aggregated_boxes
+                freezer_stored_samples += stored_samples
                 box_n_shelves_n_racks_data.append(
                     self._create_dict(shelf.id, 'shelf_detail', 'fas fa-layer-group',
                                       shelf.shelf_name, capacity, stored_samples))
-
             for rack in freezer.racks.all():
                 aggregated_boxes, capacity, stored_samples = self._aggregate_boxes(
                     rack.boxes.all(), 'rack_detail', 'fas fa-box-open')
                 box_n_shelves_n_racks_data += aggregated_boxes
+                freezer_aggregated_boxes += aggregated_boxes
+                freezer_stored_samples += stored_samples
                 box_n_shelves_n_racks_data.append(
                     self._create_dict(rack.id, 'rack_detail', 'fas fa-box-open',
                                       rack.rack_name, capacity, stored_samples))
-
             freezer_data.update(
                 inside_freezer=box_n_shelves_n_racks_data,
                 freezer_total_capacity=freezer_total_capacity,
-                freezer_total_samples=freezer_total_samples
+                freezer_total_samples=freezer_total_samples,
+                freezer_stored_samples=freezer_stored_samples,
+                aggregated_capacity=len(freezer_aggregated_boxes),
             )
 
             facility_data.append(freezer_data)
 
-        context['facility_data'] = facility_data
+        cardsHTML = render_to_string('storage_module/card_fragment.html',
+                                     {'facility_data': facility_data})
+        tableHTML = render_to_string('storage_module/table_fragment.html',
+                                     {'facility_data': facility_data})
+
+        context['cardsHTML'] += cardsHTML
+        context['tableHTML'] += tableHTML
 
         return context
 

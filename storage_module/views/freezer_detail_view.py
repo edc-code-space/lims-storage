@@ -31,12 +31,30 @@ class FreezerDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         freezer = self.object
 
-        context['inside_freezer'] = self.get_container_data('box', 'boxes', 'fas fa-cube')
+        context['inside_freezer'] = self.get_container_data(
+            'box',
+            freezer.boxes.filter(shelf=None, rack=None),
+            'fas fa-cube')
         context['inside_freezer'].extend(
-            self.get_container_data('shelf', 'shelves', 'fas fa-layer-group'))
+            self.get_container_data(
+                'shelf',
+                freezer.shelves.all(),
+                'fas fa-layer-group'))
         context['inside_freezer'].extend(
-            self.get_container_data('rack', 'racks', 'fas fa-box-open'))
+            self.get_container_data(
+                'rack',
+                freezer.racks.all(),
+                'fas fa-box-open'))
 
+        total_samples = sum(
+            container['stored_samples'] for container in context['inside_freezer'])
+        total_capacity = sum(
+            container['capacity'] for container in context['inside_freezer'])
+
+        context["total_samples"] = total_samples
+        context["total_capacity"] = total_capacity
+        context["percent_filled"] = (total_samples / total_capacity) * 100 if (
+            total_capacity) else 0
         context['type'] = 'Freezer'
         context['name'] = freezer.freezer_name
         context['obj'] = freezer
@@ -45,10 +63,12 @@ class FreezerDetailView(LoginRequiredMixin, DetailView):
 
         return context
 
-    def get_container_data(self, container_type, queryset_method, icon, ):
+    def get_container_data(self, container_type, queryset_objs, icon, ):
+        global samples_in_container
         container_data = []
         freezer = self.object
-        for container in getattr(freezer, queryset_method).all():
+
+        for container in queryset_objs:
             if isinstance(container, DimBox):
                 capacity = container.box_capacity
                 samples_in_container = {'box': container}

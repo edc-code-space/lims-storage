@@ -1,0 +1,32 @@
+{% for freezer_data in facility_data %}
+    <div class="card m-1" style="max-width: 500px">
+        <div class="card-body d-flex flex-row ">
+            <div class="d-flex align-items-center pe-2">
+                <h5 class="card-title">{{ freezer_data.freezer.freezer_name }}</h5>
+            </div>
+            <div class="d-flex flex-column w-75 border-start">
+                <div class="d-flex align-items-end justify-content-end">
+                    <a href="{% url 'freezer_detail' freezer_data.freezer.id %}" class="btn btn-primary">View Details</a>
+                </div>
+                <div class="d-flex flex-row  justify-content-around">
+                    <div class="d-flex flex-column align-items-center">
+                        <p>Box</p>
+                        <p>{{ freezer_data.aggregated_capacity }}</p>
+                    </div>
+                    <div class="d-flex flex-column align-items-center">
+                        <p>Samples</p>
+                        <p>{{ freezer_data.freezer_stored_samples }}</p>
+                    </div>
+                    <div class="d-flex flex-column align-items-center">
+                        <p>Uterlised</p>
+                        <p>{{ freezer_data.freezer_total_samples }}</p>
+                    </div>
+                    <div class="d-flex flex-column align-items-center">
+                        <p>Capacity</p>
+                        <p>{{ freezer_data.freezer_total_capacity }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}

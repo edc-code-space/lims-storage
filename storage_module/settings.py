@@ -157,11 +157,11 @@ MESSAGE_TAGS = {
 }
 
 ALLOWED_HOSTS = ['127.0.0.1', 'http://datawarehouse.bhp.org.bw',
-                 'https://datawarehouse.bhp.org.bw']
+                 'https://datawarehouse.bhp.org.bw', 'localhost']
 CSRF_TRUSTED_ORIGINS = ['http://datawarehouse.bhp.org.bw',
-                        'https://datawarehouse.bhp.org.bw']
+                        'https://datawarehouse.bhp.org.bw', 'http://localhost:8000']
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
-SESSION_COOKIE_DOMAIN = 'datawarehouse.bhp.org.bw'
-CSRF_COOKIE_DOMAIN = 'datawarehouse.bhp.org.bw'
+SESSION_COOKIE_DOMAIN = '.localhost'
+CSRF_COOKIE_DOMAIN = '.localhost'

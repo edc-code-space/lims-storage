@@ -1,12 +1,13 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.views.generic import TemplateView
 
-from storage_module.models import (BoxPosition, DimFreezer, DimRack,
+from storage_module.models import (BoxPosition, DimFacility, DimFreezer, DimRack,
                                    DimSample, DimSampleType, DimShelf)
-from storage_module.util import get_data
+from storage_module.util import append_entity_info, append_if_samples
 
 
 class HomeView(TemplateView):
@@ -20,6 +21,30 @@ class HomeView(TemplateView):
             'participant_id').distinct().count()
         context['studies'] = DimSample.objects.values(
             'protocol_number').distinct().count()
+
+        return context
+
+
+class DashboardView(TemplateView):
+    template_name = 'storage_module/dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['facility_count'] = DimFacility.objects.count()
+        context['freezer_count'] = DimFreezer.objects.count()
+        context['sample_count'] = BoxPosition.objects.count()
+
+        all_protocol_counts = DimSample.objects.values('protocol_number').annotate(
+            count=Count('protocol_number')).order_by('-count')
+        context['protocol_counts'] = all_protocol_counts[:5]
+        context['total_protocol_count'] = all_protocol_counts.count()
+
+        sample_type_count = DimSample.objects.values_list('sample_type',
+                                                          flat=True).distinct().count()
+        context['sample_type_count'] = sample_type_count
+
+        study_count = DimSample.objects.values('protocol_number').distinct().count()
+        context['study_count'] = study_count
 
         return context
 
@@ -38,32 +63,42 @@ def get_racks(request):
     return JsonResponse(list(racks), safe=False)
 
 
-@login_required
+def get_sample_details(request, sample_id):
+    sample = get_object_or_404(DimSample, sample_id=sample_id)
+    data = {
+        "sample_id": sample.sample_id,
+        "protocol_number": sample.protocol_number,
+        "tid": sample.tid,
+        "sample_type": sample.sample_type.sample_type,
+        "source_file": sample.source_file.source_file_name,
+        "time_sampled": sample.time_sampled,
+        "sample_condition": sample.sample_condition,
+        "user_created": sample.user_created,
+        "participant_id": sample.participant_id,
+        "gender": sample.gender,
+        "date_of_birth": sample.date_of_birth,
+        "date_sampled": sample.date_sampled,
+        "requisition_id": sample.requisition_id,
+        "sample_status": sample.sample_status.name,
+    }
+    return JsonResponse(data)
+
+
 def freezer_data(request, freezer_id):
     freezer = get_object_or_404(DimFreezer, id=freezer_id)
     box_n_shelves_n_racks_data = []
 
-    box_n_shelves_n_racks_data += get_data(freezer.boxes.filter(shelf=None, rack=None),
-                                           'box_detail', 'fas fa-cube',
-                                           lambda box: box.box_name,
-                                           lambda box: box.box_capacity,
-                                           BoxPosition.objects)
-    box_n_shelves_n_racks_data += get_data(freezer.shelves.all(), 'shelf_detail',
-                                           'fas fa-layer-group',
-                                           lambda shelf: shelf.shelf_name,
-                                           sum([box.box_capacity for box in
-                                                shelf.boxes.all() if
-                                                BoxPosition.objects.filter(
-                                                    box=box).count() > 0]),
-                                           BoxPosition.objects)
-    box_n_shelves_n_racks_data += get_data(freezer.racks.all(), 'rack_detail',
-                                           'fas fa-box-open', lambda rack: rack.rack_name,
-                                           sum([box.box_capacity for box in
-                                                rack.boxes.all() if
-                                                BoxPosition.objects.filter(
-                                                    box=box).count() > 0]),
-                                           BoxPosition.objects)
+    for box in freezer.boxes.filter(shelf=None, rack=None):
+        append_if_samples(box, box_n_shelves_n_racks_data, 'box_detail', 'fas fa-cube',
+                          box.box_name)
+
+    append_entity_info(freezer.shelves.all(), box_n_shelves_n_racks_data, 'shelf_detail',
+                       'fas fa-layer-group', 'shelf_name')
+
+    append_entity_info(freezer.racks.all(), box_n_shelves_n_racks_data, 'rack_detail',
+                       'fas fa-box-open', 'rack_name')
 
     html = render_to_string("storage_module/child_box_detail.html",
                             {'inside_freezer': box_n_shelves_n_racks_data})
+
     return JsonResponse({'html': html})

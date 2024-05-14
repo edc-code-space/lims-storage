@@ -1,3 +1,5 @@
+import json
+
 from django import template
 
 from django.apps import apps as django_apps
@@ -19,3 +21,8 @@ def is_instance(obj, model_name):
 @register.filter
 def hasattr(obj, attr):
     return hasattr(obj, attr)
+
+
+@register.filter('parse_json')
+def parse_json(value):
+    return json.loads(value)

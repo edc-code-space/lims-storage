@@ -33,6 +33,15 @@ class RackDetailView(LoginRequiredMixin, DetailView):
         rack = self.object
         boxes = rack.boxes.all()
         context['inside_freezer'] = self.build_box_data(boxes)
+        total_samples = sum(
+            container['stored_samples'] for container in context['inside_freezer'])
+        total_capacity = sum(
+            container['capacity'] for container in context['inside_freezer'])
+
+        context["total_samples"] = total_samples
+        context["total_capacity"] = total_capacity
+        context["percent_filled"] = (total_samples / total_capacity) * 100 if (
+            total_capacity) else 0
         context.update({
             'type': 'rack',
             'name': rack.rack_name,
