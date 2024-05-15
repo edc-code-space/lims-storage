@@ -3,8 +3,10 @@
     <tr>
         <th></th>
         <th>Name</th>
+        <th>Boxes</th>
+        <th>Samples</th>
+        <th>Utilised</th>
         <th>Capacity</th>
-        <th>Stored Samples</th>
     </tr>
     </thead>
 
@@ -18,8 +20,10 @@
                 <i class="fas fa-snowflake"></i>
                 <a href="{% url 'freezer_detail' freezer_data.freezer.id %}">{{ freezer_data.freezer.freezer_name }}</a>
             </td>
-            <td>{{ freezer_data.freezer_total_capacity }}</td>
+            <td>{{ freezer_data.aggregated_capacity }}</td>
+            <td>{{ freezer_data.freezer_stored_samples }}</td>
             <td>{{ freezer_data.freezer_total_samples }}</td>
+            <td>{{ freezer_data.freezer_total_capacity }}</td>
         </tr>
     {% endfor %}
     </tbody>

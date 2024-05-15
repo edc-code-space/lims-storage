@@ -5,11 +5,14 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import DetailView
 
+from storage_module.barcode_printer_helper import BarcodePrinter
 from storage_module.forms import MoveBoxForm
-from storage_module.models import DimBox, DimSampleStatus
+from storage_module.models import DimBox, DimSampleStatus, DimSampleType
+from storage_module.util import update_sample_status
+from storage_module.views.view_mixin import ViewMixin
 
 
-class BoxDetailView(LoginRequiredMixin, DetailView):
+class BoxDetailView(LoginRequiredMixin, ViewMixin, DetailView):
     model = DimBox
     template_name = 'storage_module/box_detail.html'
 
@@ -21,12 +24,24 @@ class BoxDetailView(LoginRequiredMixin, DetailView):
         form = MoveBoxForm(request.POST)
 
         action = request.POST.get('action')
+        selected_samples = request.POST.getlist('sample_ids')
+
         if action == 'move':
-            selected_samples = request.POST.getlist('sample_ids')
             base_url = reverse('move_samples')
             query_string = urlencode({'sample_ids': ','.join(selected_samples)})
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
+
+        if action in self.sample_types:
+            for sample_id in selected_samples:
+                update_sample_status(sample_id=sample_id, status=action)
+
+        if action == "export":
+            return self.export_samples_as_csv(selected_samples)
+
+        if action == 'print':
+            printer = BarcodePrinter()
+            printer.print_barcode_for_selected_samples(selected_samples)
 
         if form.is_valid():
             box = self.get_object()
@@ -74,6 +89,7 @@ class BoxDetailView(LoginRequiredMixin, DetailView):
             x_labels=x_labels,
             y_labels=y_labels,
             sample_statuses=self.sample_statuses,
+            sample_types=self.sample_types,
         )
 
         return context
@@ -81,3 +97,7 @@ class BoxDetailView(LoginRequiredMixin, DetailView):
     @property
     def sample_statuses(self):
         return DimSampleStatus.objects.all()
+
+    @property
+    def sample_types(self):
+        return list(set(DimSampleType.objects.values_list('sample_type', flat=True)))

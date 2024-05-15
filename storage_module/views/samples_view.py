@@ -5,6 +5,7 @@ from django.views.generic import TemplateView
 
 from storage_module.models import DimBox, DimFacility, DimSample, DimSampleStatus, \
     DimSampleType, DimSourceFile
+from storage_module.util import update_sample_status
 from storage_module.views.view_mixin import ViewMixin
 
 
@@ -64,10 +65,7 @@ class SamplesView(LoginRequiredMixin, ViewMixin, TemplateView):
             return self.export_samples_as_csv(sample_ids)
         elif action and int(action) in self.sample_statuses.values_list('id', flat=True):
             for sample_id in sample_ids:
-                sample = get_object_or_404(DimSample, sample_id=sample_id)
-                new_status = get_object_or_404(DimSampleStatus, id=action)
-                sample.sample_status = new_status
-                sample.save()
+                update_sample_status(sample_id=sample_id, status=action)
         return self.get(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
