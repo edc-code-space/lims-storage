@@ -19,20 +19,31 @@ class MoveSampleForm(forms.Form):
 
 
 class MoveBoxForm(forms.Form):
+    facility = forms.ModelChoiceField(
+        queryset=DimFacility.objects.all(),
+        widget=forms.Select(attrs={"class": "form-control form-control-sm select2"}),
+    )
     freezer = forms.ModelChoiceField(
         queryset=DimFreezer.objects.all(),
-        widget=forms.Select(attrs={"class": "select2"}),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control form-control-sm select2"}),
     )
-    shelf = forms.ModelChoiceField(queryset=DimShelf.objects.all(),
-                                   required=False,
-                                   widget=forms.Select(attrs={"class": "select2"}))
-    rack = forms.ModelChoiceField(queryset=DimRack.objects.all(),
-                                  required=False,
-                                  widget=forms.Select(attrs={"class": "select2"}))
+    shelf = forms.ModelChoiceField(
+        queryset=DimShelf.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control form-control-sm select2"}),
+    )
+    rack = forms.ModelChoiceField(
+        queryset=DimRack.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control form-control-sm select2"}),
+    )
 
     def __init__(self, *args, **kwargs):
         super(MoveBoxForm, self).__init__(*args, **kwargs)
         self.fields['rack'].label_from_instance = lambda obj: "{}".format(obj.rack_name)
+        self.fields['facility'].label_from_instance = lambda obj: "{}".format(
+            obj.facility_name)
         self.fields['shelf'].label_from_instance = lambda obj: "{}".format(obj.shelf_name)
         self.fields['freezer'].label_from_instance = lambda obj: "{}".format(
             obj.freezer_name)

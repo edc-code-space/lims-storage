@@ -20,8 +20,8 @@ from django.urls.conf import include
 
 from storage_module import views
 from storage_module.views import BoxDetailView, FacilityDetailView, FacilityListView, \
-    FreezerDetailView, HomeView, RackDetailView, SampleDetailView, SamplesView, \
-    ShelfDetailView, SampleMoveWizard
+    FreezerDetailView, HomeView, RackDetailView, SampleDetailView, SampleMoveWizard, \
+    SamplesView, ShelfDetailView
 from storage_module.views.views import DashboardView
 
 urlpatterns = [
@@ -32,6 +32,7 @@ urlpatterns = [
     path('samples/', SamplesView.as_view(), name='samples_url'),
     path('get_shelves/', views.get_shelves, name='get_shelves'),
     path('get_racks/', views.get_racks, name='get_racks'),
+    path('get_freezers/', views.get_freezers, name='get_freezers'),
     path('samples/<str:sample_id>/', SampleDetailView.as_view(), name='sample_detail'),
     path('box/<str:box_id>/', BoxDetailView.as_view(), name='box_detail'),
     path('rack/<str:rack_id>/', RackDetailView.as_view(), name='rack_detail'),
@@ -43,6 +44,8 @@ urlpatterns = [
     path('get_sample_details/<str:sample_id>', views.get_sample_details,
          name='get_sample_details'),
     path('move_samples/', SampleMoveWizard.as_view(), name='move_samples'),
+    path('ajax/validate_position/', views.ajax_validate_position,
+         name='ajax_validate_position'),
     path('reports/', HomeView.as_view(), name='reports_url'),
     path('dashboard/', DashboardView.as_view(), name='dashboard_url'),
     path('storage_view/', FacilityListView.as_view(), name='storage_view'),

@@ -27,6 +27,10 @@ class FacilityListView(LoginRequiredMixin, ListView):
             facility_capacity = 0
             utilized_storage = 0
 
+            boxes_list = []
+
+            samples = 0
+
             for freezer in freezers:
                 boxes = DimBox.objects.filter(
                     Q(shelf__freezer=freezer) |
@@ -38,12 +42,19 @@ class FacilityListView(LoginRequiredMixin, ListView):
                 freezer_capacity = sum(box.box_capacity for box in boxes)
                 facility_capacity += freezer_capacity
 
+                boxes_list += list(boxes)
+
                 for box in boxes:
-                    utilized_storage += len(box.get_samples())
+                    samples += len(box.get_samples())
+
+            utilized_storage = round(((samples / facility_capacity)
+                                      * 100), 1) if facility_capacity else 0
 
             data.append({
                 'id': facility.id,
                 'facility_name': facility.facility_name,
+                'samples': samples,
+                'boxes': len(boxes_list),
                 'facility_capacity': facility_capacity,
                 'utilized_storage': utilized_storage,
                 'available_capacity': facility_capacity - utilized_storage

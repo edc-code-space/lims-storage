@@ -1,5 +1,6 @@
 {% extends 'storage_module/base_storage.html' %}
 {% load storage_module_extras %}
+{% load widget_tweaks %}
 
 {% block extra_script %}
     <script>
@@ -74,9 +75,26 @@
                 });
             });
 
+            $('body').on('change', '#id_facility', function () {
+                var facilityId = $(this).val();
+
+                $.ajax({
+                    url: "/get_freezers/",
+                    data: {
+                        'facility_id': facilityId
+                    },
+                    success: function (data) {
+                        var select = $('#id_freezer');
+                        select.empty();
+                        $.each(data, function (key, value) {
+                            select.append($('<option></option>').attr('value', value.id).text(value.freezer_name));
+                        });
+                    }
+                });
+            });
+
             $('body').on('change', '#id_freezer', function () {
                 var freezerId = $(this).val();
-
                 $.ajax({
                     url: "/get_shelves/",
                     data: {
@@ -104,8 +122,6 @@
                         });
                     }
                 });
-
-
             });
             $('.select2').select2();
         });
@@ -259,5 +275,48 @@
                     data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body" id="sampleDetailsBody"></div>
+    </div>
+
+    <div class="modal fade" id="moveBoxModal" tabindex="-1"
+         aria-labelledby="moveBoxModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-content rounded" style="width: 50rem">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="moveBoxModalLabel">Move Box</h5>
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {{ move_box_form.facility.label_tag }}
+                            {{ move_box_form.facility|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group">
+                            {{ move_box_form.freezer.label_tag }}
+                            {{ move_box_form.freezer|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group">
+                            {{ move_box_form.shelf.label_tag }}
+                            {{ move_box_form.shelf|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group">
+                            {{ move_box_form.rack.label_tag }}
+                            {{ move_box_form.rack|add_class:"form-control" }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-dismiss="modal">Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">Move</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 {% endblock %}
