@@ -8,6 +8,7 @@ from django.views.generic import TemplateView
 from storage_module.models import (BoxPosition, DimFacility, DimFreezer, DimRack,
                                    DimSample, DimSampleType, DimShelf)
 from storage_module.util import append_entity_info, append_if_samples
+from storage_module.views import SampleMoveWizard
 
 
 class HomeView(TemplateView):
@@ -63,6 +64,13 @@ def get_racks(request):
     return JsonResponse(list(racks), safe=False)
 
 
+@login_required
+def get_freezers(request):
+    facility = request.GET.get('facility_id')
+    freezers = DimFreezer.objects.filter(facility_id=facility).values()
+    return JsonResponse(list(freezers), safe=False)
+
+
 def get_sample_details(request, sample_id):
     sample = get_object_or_404(DimSample, sample_id=sample_id)
     data = {
@@ -102,3 +110,20 @@ def freezer_data(request, freezer_id):
                             {'inside_freezer': box_n_shelves_n_racks_data})
 
     return JsonResponse({'html': html})
+
+
+def ajax_validate_position(request):
+    box = request.GET.get('box', None)
+    x_position = request.GET.get('x_position', None)
+    y_position = request.GET.get('y_position', None)
+    sample = request.GET.get('sample', None)
+
+    if SampleMoveWizard().validate_position(box, int(x_position) - 1, y_position):
+        error = {
+            "error": {
+                "message": "The chosen position is already occupied. Please choose a "
+                           f"different position at sample {sample}."
+            }
+        }
+        return JsonResponse(error)
+    return JsonResponse({"error": None})

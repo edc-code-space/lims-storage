@@ -2,6 +2,70 @@
 {% load storage_module_extras %}
 {% load widget_tweaks %}
 
+{% block extra_script %}
+    <script>
+        $(document).ready(function () {
+            $('.btn-primary').click(function (e) {
+                e.preventDefault();
+                var validationResult = true;
+                var url = "{% url 'ajax_validate_position' %}";
+                var box = "{{ request.session.selected_box }}";
+                var positions = {};
+
+                var x_positions = $('select[id^="id_form"][id$="-new_x_position"]');
+                var y_positions = $('select[id^="id_form"][id$="-new_y_position"]');
+
+                x_positions.each(function (index, element) {
+                    var x_position = $(element).val();
+                    var y_position = y_positions.eq(index).val();
+                    var posKey = x_position + 'x' + y_position;
+
+                    if (positions[posKey]) {
+                        validationResult = false;
+                        alert("Two samples cannot be placed into the same position (" + x_position + ", " + y_position + ")");
+                        return;
+                    }
+
+                    $.ajax({
+                        url: url,
+                        type: 'get',
+                        data: {
+                            "sample": index + 1,
+                            "box": box,
+                            "x_position": x_position,
+                            "y_position": y_position
+                        },
+                        success: function (data) {
+                            if (data.error) {
+                                validationResult = false;
+                                alert(data.error.message);
+                            } else {
+                                positions[posKey] = true;
+                            }
+                        },
+                        async: false
+                    });
+
+                    if (!validationResult) return;
+                });
+
+                if (validationResult) {
+                    $('form').submit();
+                }
+            });
+        });
+    </script>
+
+    <style>
+        .container {
+            margin-left: 10rem;
+            min-height: 100vh;
+            margin: 0;
+        }
+    </style>
+
+{% endblock %}
+
 {% block content %}
     <body>
     <div class="container mt-5">

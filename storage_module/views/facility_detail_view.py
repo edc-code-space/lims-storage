@@ -56,13 +56,11 @@ class FacilityDetailView(LoginRequiredMixin, DetailView):
             freezer_aggregated_boxes = []
             freezer_stored_samples = 0
 
-            freezer_total_samples = sum(len(box.get_samples()) for box in boxes)
-            freezer_total_capacity = sum(box.box_capacity for box in boxes)
             selected_box_ids = freezer.boxes.all().values_list('id', flat=True)
 
             aggregated_boxes, aggregated_boxes_capacity, aggregated_boxes_samples = (
                 self._aggregate_boxes(freezer.boxes.filter(shelf=None, rack=None),
-                                       'box_detail', 'fas fa-cube'))
+                                      'box_detail', 'fas fa-cube'))
             box_n_shelves_n_racks_data += aggregated_boxes
             freezer_aggregated_boxes += aggregated_boxes
             freezer_stored_samples += aggregated_boxes_samples
@@ -84,6 +82,13 @@ class FacilityDetailView(LoginRequiredMixin, DetailView):
                 box_n_shelves_n_racks_data.append(
                     self._create_dict(rack.id, 'rack_detail', 'fas fa-box-open',
                                       rack.rack_name, capacity, stored_samples))
+
+            freezer_total_capacity = sum(
+                box.get('capacity', 0) for box in freezer_aggregated_boxes)
+
+            freezer_total_samples = round(
+                ((freezer_stored_samples / freezer_total_capacity)
+                 * 100), 1) if freezer_total_capacity else 0
             freezer_data.update(
                 inside_freezer=box_n_shelves_n_racks_data,
                 freezer_total_capacity=freezer_total_capacity,

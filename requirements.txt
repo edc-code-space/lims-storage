@@ -18,7 +18,8 @@ django-select2==8.1.2
 django-simple-history==3.5.0
 django-widget-tweaks==1.5.0
 docutils==0.20.1
-git+https://github.com/botswana-harvard/edc-base.git@develop#egg=edc_baseexceptiongroup==1.2.1
+git+https://github.com/botswana-harvard/edc-base.git@develop#egg=edc_base
+exceptiongroup==1.2.1
 executing==2.0.1
 Faker==23.2.1
 ipython==8.18.1
@@ -29,6 +30,7 @@ mysqlclient==2.2.4
 packaging==23.2
 parso==0.8.4
 pexpect==4.9.0
+pillow==10.3.0
 prompt-toolkit==3.0.43
 ptyprocess==0.7.0
 pure-eval==0.2.2
@@ -47,3 +49,4 @@ traitlets==5.14.3
 types-python-dateutil==2.8.19.20240106
 typing_extensions==4.10.0
 wcwidth==0.2.13
+zpl==0.1.11

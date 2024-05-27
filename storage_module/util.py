@@ -1,4 +1,6 @@
-from storage_module.models import BoxPosition
+from django.shortcuts import get_object_or_404
+
+from storage_module.models import BoxPosition, DimSample, DimSampleStatus
 
 
 def get_available_positions(box):
@@ -73,4 +75,10 @@ def append_entity_info(entities, data_list, url, icon, name_attr):
                                         capacity, stored_samples)
             data_list.append(entity_dict)
 
+
+def update_sample_status(sample_id, status):
+    sample = get_object_or_404(DimSample, sample_id=sample_id)
+    new_status = get_object_or_404(DimSampleStatus, id=status)
+    sample.sample_status = new_status
+    sample.save()
 

@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import HttpResponseRedirect
@@ -54,6 +53,7 @@ class SampleMoveWizard(LoginRequiredMixin, SessionWizardView):
         if step == '3':
             sample_ids = form_kwargs.get('sample_ids', [])
             selected_box = self.get_cleaned_data_for_step('2')['box']
+            self.request.session['selected_box'] = selected_box.id
             SampleMoveFormSet = forms.formset_factory(SampleMoveForm, extra=0,
                                                       can_delete=False)
             if data is not None:
@@ -66,6 +66,14 @@ class SampleMoveWizard(LoginRequiredMixin, SessionWizardView):
                              in sample_ids])
 
         return form
+
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form=form, **kwargs)
+
+        selected_box = self.storage.extra_data.get('selected_box')
+        context['selected_box'] = selected_box
+
+        return context
 
     def validate_position(self, box, x_position, y_position):
         """Validates if a BoxPosition is occupied."""
@@ -94,26 +102,18 @@ class SampleMoveWizard(LoginRequiredMixin, SessionWizardView):
                 cleaned_data = form.cleaned_data
                 box = form.initial.get('box')
                 sample_id = form.initial.get('sample_id')
-
-                new_x_position = int(cleaned_data["new_x_position"]) - 1
-
-                if self.validate_position(box, cleaned_data["new_x_position"],
-                                          cleaned_data["new_y_position"]):
-                    messages.error(self.request,
-                                   "The chosen position is already occupied. Please "
-                                   "choose a different position.")
-                    return self.render(form_list[-1])
-
                 sample = DimSample.objects.get(sample_id=sample_id)
                 new_positions.append({
                     'sample': sample,
                     'box': box,
-                    'x_position': cleaned_data.get("new_x_position"),
+                    'x_position': int(cleaned_data.get("new_x_position")) - 1,
                     'y_position': cleaned_data.get("new_y_position")
                 })
 
         for position in new_positions:
             self.create_box_position(position["sample"], position["box"],
                                      position["x_position"], position["y_position"])
+
+        selected_box = self.request.session.pop('selected_box', None)
 
         return HttpResponseRedirect(reverse('box_detail', args=[box.id]))

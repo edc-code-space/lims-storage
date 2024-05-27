@@ -165,3 +165,17 @@ CSRF_COOKIE_SECURE = False
 
 SESSION_COOKIE_DOMAIN = '.localhost'
 CSRF_COOKIE_DOMAIN = '.localhost'
+
+config_file = configparser.ConfigParser()
+config_file.read(os.path.join(ETC_DIR, 'storage_module.ini'))
+
+EMAIL_BACKEND = config_file['email']['email_backend']
+EMAIL_HOST = config_file['email']['email_host']
+EMAIL_PORT = config_file['email']['email_port']
+EMAIL_HOST_USER = config_file['email']['email_host_user']
+EMAIL_HOST_PASSWORD = config_file['email']['email_host_pwd']
+EMAIL_USE_TLS = config_file['email']['email_use_tls']
+DEFAULT_FROM_EMAIL = config_file['email']['email_from']
+
+PRINTER_IP_ADDRESS = config_file['printing']['ip_address']
+PRINTER_PORT = config_file['printing']['port']
