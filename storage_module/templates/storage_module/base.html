@@ -7,7 +7,7 @@
     <title>{% block title %}Lab Storage Module{% endblock %}</title>
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-            crossorigin="anonymous">
+          crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
             integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
             crossorigin="anonymous"></script>
@@ -50,16 +50,16 @@
     <script src="https://cdn.datatables.net/buttons/2.0.5/js/buttons.print.min.js"></script>
     <link rel="stylesheet" type="text/css"
           href="https://cdn.datatables.net/v/dt/jq-3.3.1/jszip-2.5.0/dt-1.11.3/b-2.2.1/b-html5-2.2.1/b-print-2.2.1/datatables.min.css"
-            crossorigin="anonymous"/>
+          crossorigin="anonymous"/>
     <script type="text/javascript"
             src="https://cdn.datatables.net/v/dt/jq-3.3.1/jszip-2.5.0/dt-1.11.3/b-2.2.1/b-html5-2.2.1/b-print-2.2.1/datatables.min.js"
             crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-            integrity="sha384-/xUj+3OJU5yExlq6GSYGSHk7tPXikysD6nO9sbKb8f4TdrollmUj3zKvk/3e+944"
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
             crossorigin="anonymous"></script>
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/bootstrap-table.min.css"
-            crossorigin="anonymous">
+          crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/bootstrap-table.min.js"
             crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/@coreui/coreui@5.0.0/dist/css/coreui.min.css"
@@ -70,14 +70,14 @@
             integrity="sha384-Wl6mLWl+C0OgKzQqXtoEXuTkm2RwXManFDTNyMRxPR5zh3DFIUIDhq7Fp1JCFm1V"
             crossorigin="anonymous"></script>
     <link href="https://unpkg.com/@coreui/icons/css/free.min.css" rel="stylesheet"
-            crossorigin="anonymous">
+          crossorigin="anonymous">
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-            crossorigin="anonymous">
+          crossorigin="anonymous">
 
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/bootstrap-table.min.css"
-            crossorigin="anonymous">
+          crossorigin="anonymous">
 
     <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.29.0/tableExport.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/bootstrap-table.min.js"></script>
@@ -90,8 +90,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"></script>
-
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
     {% block extra_script %}{% endblock %}
     {% block custom_head %}{% endblock %}
@@ -103,6 +102,51 @@
                 $("#brandText").toggleClass('d-none');
             });
         });
+
+        document.addEventListener("DOMContentLoaded", function (event) {
+            const expandedWidth = '390px';
+            const collapsedWidth = '46px';
+
+            const showNavbar = (toggleId, navId, bodyId, headerId, headerToggleId) => {
+                const toggle = document.getElementById(toggleId),
+                    nav = document.getElementById(navId),
+                    bodypd = document.getElementById(bodyId),
+                    headerpd = document.getElementById(headerId),
+                    headerToggle = document.getElementById(headerToggleId);
+
+                if (toggle && nav && bodypd && headerpd && headerToggle) {
+                    let padding = nav.classList.contains('show') ? `calc(${expandedWidth} + 2rem)` : `calc(${collapsedWidth} + 2rem)`;
+                    bodypd.style.paddingLeft = padding
+                    headerToggle.style.paddingLeft = padding
+
+                    toggle.addEventListener('click', () => {
+                        // Toggle padding based on toggled navbar state
+                        let padding = nav.classList.contains('show') ? `calc(${collapsedWidth} + 2rem)` : `calc(${expandedWidth} + 2rem)`;
+                        bodypd.style.paddingLeft = padding;
+                        headerToggle.style.paddingLeft = padding;
+                        nav.classList.toggle('show');
+                        toggle.classList.toggle('cil-x');
+                        bodypd.classList.toggle('body-pd');
+                        headerpd.classList.toggle('body-pd');
+                    });
+                }
+            }
+
+            showNavbar('header-toggle', 'nav-bar', 'body-pd', 'header', 'header-toggle');
+
+            const linkColor = document.querySelectorAll('.nav_link');
+
+            function colorLink() {
+                if (linkColor) {
+                    linkColor.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            }
+
+            linkColor.forEach(l => l.addEventListener('click', colorLink));
+        });
+
+
     </script>
 
     <style>
@@ -130,11 +174,6 @@
             transition: width .3s;
         }
 
-        .custom-bg {
-            background-color: #3AA3F5;
-            padding: 10px;
-        }
-
         .log-out_container {
             background-color: #FFFFFF;
             border-radius: 20%;
@@ -151,65 +190,234 @@
             justify-content: center;
             align-items: center;
         }
+
+        @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
+        :root {
+            --header-height: 3rem;
+            --nav-width: 200px;
+            --first-color: #4723D9;
+            --first-color-light: #9683e1;
+            --white-color: #FFFFFF;
+            --body-font: 'Nunito', sans-serif;
+            --normal-font-size: 1rem;
+            --nav-width-collapsed: 68px;
+            --nav-width-expanded: 200px;
+            --z-fixed: 100
+        }
+
+        *, ::before, ::after {
+            box-sizing: border-box
+        }
+
+        body {
+            position: relative;
+            margin: var(--header-height) 0 0 0;
+            padding: 0 1rem;
+            font-family: var(--body-font);
+            font-size: var(--normal-font-size);
+            transition: .5s
+        }
+
+        a {
+            text-decoration: none
+        }
+
+        .header {
+            width: 100%;
+            height: var(--header-height);
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            background-color: var(--white-color);
+            z-index: var(--z-fixed);
+            transition: .5s
+        }
+
+        .header_toggle {
+            color: var(--first-color);
+            font-size: 1.5rem;
+            cursor: pointer
+        }
+
+        .header_img {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            justify-content: center;
+            border-radius: 50%;
+            overflow: hidden
+        }
+
+        .header_img img {
+            width: 40px
+        }
+
+        .l-navbar {
+            position: fixed;
+            top: 0;
+            left: -30%;
+            width: var(--nav-width-collapsed);
+            height: 100vh;
+            border-right: 1px solid #858484;
+            padding: .5rem 1rem 0 0;
+            transition: .5s;
+            z-index: var(--z-fixed);
+        }
+
+        .nav {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        .nav_logo, .nav_link {
+            display: grid;
+            grid-template-columns: max-content max-content;
+            align-items: center;
+            column-gap: 1rem;
+            padding: .5rem 0 .5rem 1.5rem
+        }
+
+        .nav_logo {
+            margin-bottom: 2rem
+        }
+
+        .nav_logo-icon {
+            font-size: 1.25rem;
+            color: var(--white-color)
+        }
+
+        .nav_logo-name {
+            color: var(--white-color);
+            font-weight: 700
+        }
+
+        .nav_link {
+            position: relative;
+            color: #0f0f0f;
+            margin-bottom: 1rem;
+            transition: .3s
+        }
+
+        .nav_link:hover {
+            color: #0d47a1;
+        }
+
+        .nav_icon {
+            font-size: 1.25rem
+        }
+
+        .show {
+            left: 0;
+            width: var(--nav-width-expanded);
+
+        }
+
+
+        .active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 2px;
+            height: 32px;
+            background-color: var(--white-color)
+        }
+
+        .height-100 {
+            height: 100vh
+        }
+
+        body, .header_toggle {
+            transition: all 0.5s ease-out !important;
+        }
+
+        @media screen and (min-width: 768px) {
+            body {
+                margin: calc(var(--header-height) + 1rem) 0 0 0;
+                padding-left: calc(var(--nav-width) + 46px)
+            }
+
+            .header {
+                height: calc(var(--header-height) + 1rem);
+            }
+
+            .header_img {
+                width: 40px;
+                height: 40px
+            }
+
+            .header_img img {
+                width: 45px
+            }
+
+            .l-navbar {
+                left: 0;
+                padding: 1rem 1rem 0 0
+            }
+
+            .show {
+                width: calc(var(--nav-width) + 200px)
+            }
+        }
+
     </style>
 
 </head>
 
-<body>
 <!-- Navigation Bar -->
-<div class="flex">
-    <div class="sidebar sidebar-wide border-end" id="mySidebar">
-        <div class="sidebar-header border-bottom" id="sidebarToggle">
-            <div class="sidebar-brand">
-                <img src="{% static "images/site_logo.png" %}" alt="site logo"
-                     style="width:30px;height:30px;"/>
-                <span id="brandText">BHHP Bio Repository</span>
-            </div>
-        </div>
-        <ul class="sidebar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'home_url' %}">
-                    <i class="nav-icon cil-home"></i> Home
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard_url' %}">
-                    <i class="nav-icon cil-chart"></i> Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'storage_view' %}">
-                    <i class="nav-icon cil-building"></i> Storage Facilities
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'samples_url' %}">
-                    <i class="nav-icon cil-eyedropper"></i> Samples
-                </a>
-            </li>
-            <div class="mt-auto custom-bg rounded">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admin:auth_user_change' user.id %}">
-                        <i class="nav-icon cil-user"></i> Account Management
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'help_url' %}">
-                        <i class="nav-icon cil-info"></i>Help
-                    </a>
-                </li>
-                <li class="flex flex-row rounded log-out_container">
-                    <i class="nav-icon cil-user"></i>
-                    <div class="flex flex-col ">
-                        <p style="font-size: 10px; height: 5px">{{ user.username }}</p>
-                        <p style="font-size: 10px; height: 5px">{{ user.email }}</p>
-                    </div>
-                    <a href="{% url 'logout' %}"><i class="cil-exit-to-app"></i></a>
-                </li>
-            </div>
-        </ul>
+<body id="body-pd">
+<header class="header" id="header">
+    <div class="header_toggle">
+        <i class="cil-menu" id="header-toggle"></i>
     </div>
+</header>
+<div class="l-navbar" id="nav-bar">
+    <nav class="nav">
+        <a class="nav_logo">
+            <img src="{% static "images/site_logo.png" %}" alt="site logo"
+                 style="width:30px;height:30px; margin-left: -0.5rem"/>
+            <span class="nav_name">BHHP Bio Repository</span>
+        </a>
+        <a href="{% url 'home_url' %}" class="nav_link active">
+            <i class="nav-icon cil-home"></i>
+            <span class="nav_name">Home</span>
+        </a>
+        <a href="{% url 'dashboard_url' %}" class="nav_link">
+            <i class="nav-icon cil-chart"></i>
+            <span class="nav_name">Dashboard</span>
+        </a>
+        <a href="{% url 'storage_view' %}" class="nav_link">
+            <i class="nav-icon cil-building"></i>
+            <span class="nav_name">Storage Facilities</span>
+        </a>
+        <a href="{% url 'samples_url' %}" class="nav_link">
+            <i class="nav-icon cil-eyedropper"></i>
+            <span class="nav_name">Samples</span>
+        </a>
+        <div class="mt-auto rounded">
+            <a href="{% url 'admin:auth_user_change' user.id %}" class="nav_link">
+                <i class="nav-icon cil-user"></i>
+                <span class="nav_name">Account Management</span>
+            </a>
+            <a href="{% url 'help_url' %}" class="nav_link">
+                <i class="nav-icon cil-info"></i>
+                <span class="nav_name">Help</span>
+            </a>
+            <a href="{% url 'logout' %}" class="nav_link">
+                <i class="cil-exit-to-app"></i>
+                <span class="nav_name">SignOut</span>
+            </a>
+        </div>
+    </nav>
+</div>
 
+<div id="main-content"
+     class="{% if sidebar_is_expanded %}expanded{% else %}collapsed{% endif %}">
     {% block messages %}
         {% if messages %}
             <div class="container mt-4 mb-4">
@@ -228,6 +436,7 @@
     {% endblock %}
     <!-- Main content of the page -->
     {% block content %}{% endblock %}
+
 </div>
 </body>
 </html>
