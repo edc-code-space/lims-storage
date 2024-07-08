@@ -146,28 +146,33 @@
            class="breadcrumb-item">
             <i class="fas fa-warehouse"></i>
             {{ box.location.facility.facility_name }}
+            (Facility)
         </a>
     {% endif %}
     {% if box.location.freezer %}
         <a href="{% url 'freezer_detail' box.location.freezer.id %}"
            class="breadcrumb-item">
             <i class="fas fa-snowflake"></i>{{ box.location.freezer.freezer_name }}
+            (Freezer)
         </a>
     {% endif %}
     {% if box.location.shelf %}
         <i class="fas fa-layer-group"></i>
         <a href="{% url 'shelf_detail' box.location.shelf.id %}" class="breadcrumb-item">
             <i class="fas fa-layer-group"></i>{{ box.location.shelf.shelf_name }}
+            (Shelf)
         </a>
     {% endif %}
     {% if box.location.rack %}
         <a href="{% url 'rack_detail' box.location.rack.id %}" class="breadcrumb-item">
             <i class="fas fa-box-open"></i>{{ box.location.rack.rack_name }}
+            (Rack)
         </a>
     {% endif %}
 
     <span class="breadcrumb-item active">
         <i class="fas fa-cube"></i> {{ box.box_name }}
+    (Box)
     </span>
 {% endblock %}
 
