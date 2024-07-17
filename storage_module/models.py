@@ -132,7 +132,7 @@ class Note(models.Model):
 
 
 class DimSample(models.Model):
-    sample_id = models.CharField(max_length=255, unique=True)
+    sample_id = models.CharField(max_length=255, unique=True, db_index=True)
     protocol_number = models.CharField(max_length=255, null=True, )
     tid = models.CharField(max_length=255, null=True, )
     participant_id = models.CharField(max_length=255, null=True, )
