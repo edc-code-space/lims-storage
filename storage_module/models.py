@@ -255,3 +255,8 @@ class MeasureSampleTypeCountsByFacility(models.Model):
     class Meta:
         app_label = 'storage_module'
         db_table = 'measuresampletypecounts'
+
+
+class Barcodes(models.Model):
+    barcode = models.CharField(max_length=255, unique=True)
+    sample_id = models.CharField(max_length=255)
