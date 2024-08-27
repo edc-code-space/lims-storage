@@ -1,93 +1,21 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum
-from django.shortcuts import get_object_or_404
-from django.views.generic import DetailView
-
-from ..forms import MoveBoxForm
-from ..models import (BoxPosition, DimBox, DimFreezer, DimRack, DimShelf)
+from .view_mixin import BaseStorageDetailView
+from ..models import (DimFreezer)
 
 
-class FreezerDetailView(LoginRequiredMixin, DetailView):
+class FreezerDetailView(BaseStorageDetailView):
     model = DimFreezer
     template_name = 'storage_module/freezer_detail.html'
+    lookup_id = 'freezer_id'
+    storage_type = 'freezer'
+    storage_icon = 'fas fa-snowflake'
 
-    def get_object(self, queryset=None):
-        return get_object_or_404(DimFreezer, id=self.kwargs.get('freezer_id'))
-
-    def post(self, request, *args, **kwargs):
-        form = MoveBoxForm(request.POST)
-        if form.is_valid():
-            self.move_box_using_form_data(form)
-        return super().get(request, *args, **kwargs)
-
-    def move_box_using_form_data(self, form):
-        box = self.get_object().boxes.get(id=self.request.POST['box_id'])
-        box.freezer = form.cleaned_data['freezer']
-        box.shelf = form.cleaned_data['shelf']
-        box.rack = form.cleaned_data['rack']
-        box.save()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_containers(self):
         freezer = self.object
+        return [
+            {'type': 'box', 'queryset': freezer.boxes.filter(shelf=None, rack=None),
+             'icon': 'fas fa-cube'},
+            {'type': 'shelf', 'queryset': freezer.shelves.all(),
+             'icon': 'fas fa-layer-group'},
+            {'type': 'rack', 'queryset': freezer.racks.all(), 'icon': 'fas fa-box-open'}
+        ]
 
-        context['inside_freezer'] = self.get_container_data(
-            'box',
-            freezer.boxes.filter(shelf=None, rack=None),
-            'fas fa-cube')
-        context['inside_freezer'].extend(
-            self.get_container_data(
-                'shelf',
-                freezer.shelves.all(),
-                'fas fa-layer-group'))
-        context['inside_freezer'].extend(
-            self.get_container_data(
-                'rack',
-                freezer.racks.all(),
-                'fas fa-box-open'))
-
-        total_samples = sum(
-            container['stored_samples'] for container in context['inside_freezer'])
-        total_capacity = sum(
-            container['capacity'] for container in context['inside_freezer'])
-
-        context["total_samples"] = total_samples
-        context["total_capacity"] = total_capacity
-        context["percent_filled"] = (total_samples / total_capacity) * 100 if (
-            total_capacity) else 0
-        context['type'] = 'Freezer'
-        context['name'] = freezer.freezer_name
-        context['obj'] = freezer
-        context['icon'] = 'fas fa-snowflake'
-        context['facility'] = freezer.facility
-
-        return context
-
-    def get_container_data(self, container_type, queryset_objs, icon, ):
-        global samples_in_container
-        container_data = []
-        freezer = self.object
-
-        for container in queryset_objs:
-            if isinstance(container, DimBox):
-                capacity = container.box_capacity
-                samples_in_container = {'box': container}
-            else:
-                capacity = container.boxes.aggregate(total_capacity=Sum('box_capacity'))[
-                    'total_capacity']
-                if isinstance(container, DimRack):
-                    samples_in_container = {'box__rack': container}
-                if isinstance(container, DimShelf):
-                    samples_in_container = {'box__shelf': container}
-            samples = BoxPosition.objects.filter(**samples_in_container).count()
-            if samples > 0:
-                name_field = f"{container_type}_name"
-                container_data.append({
-                    'id': container.id,
-                    'url': f'{container_type}_detail',
-                    'icon': icon,
-                    'name': getattr(container, name_field),  # Dynamic attribute access
-                    'capacity': capacity,
-                    'stored_samples': samples
-                })
-        return container_data
